@@ -1,3 +1,9 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Os números do trabalho das mulheres no café brasileiro, a partir do Censo Agropecuário 2017.">
 <title>O Trabalho Invisível do Café</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -24,7 +30,7 @@
   --w-bar:#E58DAE; --m-bar:#A9C47E; --hidden-bar:#E0BA7A;
   --shadow:0 1px 2px rgba(0,0,0,.3),0 6px 18px rgba(0,0,0,.25); color-scheme:dark}
 *{box-sizing:border-box}
-body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:16px;line-height:1.55}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:16px;line-height:1.55}
 a{color:var(--wine)}
 h1,h2,h3{font-family:var(--f-display);font-weight:600;text-wrap:balance;margin:0;letter-spacing:-.01em}
 :focus-visible{outline:2px solid var(--wine-2);outline-offset:3px}
@@ -138,6 +144,8 @@ footer .cta:hover{background:var(--wine-2)}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 
+</head>
+<body>
 <header class="hero">
   <img class="hero-photo" src="hero.jpg" srcset="hero-sm.jpg 768w, hero.jpg 1536w" sizes="(max-width:820px) 100vw, 62vw" alt="Agricultora sorrindo entre pés de café carregados de frutos maduros, com morros cultivados ao fundo">
   <svg class="hero-wave hw-d" viewBox="0 0 600 600" preserveAspectRatio="none" aria-hidden="true"><path d="M0 0H560C470 90 610 200 520 300C430 400 600 470 500 600H0Z"/></svg>
@@ -298,3 +306,5 @@ $('r-princ').addEventListener('click',()=>render('princ'));
 let start='onde'; try{const s=localStorage.getItem('recorte'); if(s&&D[s]) start=s}catch(e){}
 render(start);
 </script>
+</body>
+</html>
