@@ -1,0 +1,300 @@
+<title>O Trabalho Invisível do Café</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap">
+<style>
+/* Layout: herói com foto e onda bordô (mesmo do Atlas) → faixa de números com seletor de recorte → três blocos de evidência com gráficos → ressalvas e fontes */
+:root{
+  --bg:#F7F1E8; --surface:#FFFDF9; --surface-2:#F0E8DC; --line:#E6D9C8;
+  --ink:#2A1720; --ink-2:#6B5560; --wine:#541D35; --wine-2:#842E50; --wine-soft:#F2E2E8;
+  --leaf:#285C3A; --leaf-2:#799B52; --leaf-soft:#E4ECD6; --gold:#D6AB65; --on-wine:#FBF3EE;
+  --w-bar:#842E50; --m-bar:#799B52; --hidden-bar:#D6AB65;
+  --shadow:0 1px 2px rgba(60,20,35,.06),0 6px 18px rgba(60,20,35,.06);
+  --f-display:"Fraunces",Georgia,"Times New Roman",serif; --f-body:"Inter",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --r:14px;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#181013; --surface:#22171B; --surface-2:#2C1F24; --line:#3A2A30; --ink:#F3E8E6; --ink-2:#BFA9B1;
+  --wine:#D98AAA; --wine-2:#E9A4C0; --wine-soft:#3A2230; --leaf:#8FC59A; --leaf-2:#A9C47E; --leaf-soft:#2A3325; --gold:#E0BA7A; --on-wine:#1B1014;
+  --w-bar:#E58DAE; --m-bar:#A9C47E; --hidden-bar:#E0BA7A;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 6px 18px rgba(0,0,0,.25); color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#181013; --surface:#22171B; --surface-2:#2C1F24; --line:#3A2A30; --ink:#F3E8E6; --ink-2:#BFA9B1;
+  --wine:#D98AAA; --wine-2:#E9A4C0; --wine-soft:#3A2230; --leaf:#8FC59A; --leaf-2:#A9C47E; --leaf-soft:#2A3325; --gold:#E0BA7A; --on-wine:#1B1014;
+  --w-bar:#E58DAE; --m-bar:#A9C47E; --hidden-bar:#E0BA7A;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 6px 18px rgba(0,0,0,.25); color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:16px;line-height:1.55}
+a{color:var(--wine)}
+h1,h2,h3{font-family:var(--f-display);font-weight:600;text-wrap:balance;margin:0;letter-spacing:-.01em}
+:focus-visible{outline:2px solid var(--wine-2);outline-offset:3px}
+.num{font-variant-numeric:tabular-nums}
+.in{max-width:1180px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.eyebrow{font-size:12px;letter-spacing:.09em;text-transform:uppercase;font-weight:600;color:var(--ink-2)}
+
+/* herói */
+.hero{position:relative;background:#541D35;color:#FBF3EE;border-radius:0 0 28px 28px;overflow:hidden;min-height:clamp(420px,42vw,540px);isolation:isolate}
+.hero-photo{position:absolute;inset:0 0 0 auto;width:62%;height:100%;object-fit:cover;object-position:62% 30%;z-index:0}
+.hero-wave{position:absolute;inset:0 auto 0 0;width:52%;height:100%;z-index:1;filter:drop-shadow(14px 0 18px rgba(30,8,18,.45)) drop-shadow(4px 0 4px rgba(30,8,18,.3))}
+.hero-wave path{fill:#541D35}
+.hw-m{display:none}
+.hero-in{position:relative;z-index:2;max-width:1180px;margin:0 auto;padding-left:max(24px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:40px 120px}
+.hero-in>div{max-width:min(500px,44vw)}
+.brand{display:inline-flex;align-items:center;gap:10px;color:#FBF3EE;text-decoration:none;margin-bottom:36px}
+.brand svg{width:34px;height:34px}
+.brand b{font-family:var(--f-display);font-size:16px;line-height:1.05;font-weight:600}
+.hero h1{font-size:clamp(34px,4.4vw,56px);line-height:1.04;color:#FBF3EE}
+.hero h1 em{font-style:italic;color:#F7E2C0;font-weight:400}
+.hero p{max-width:40ch;font-size:17px;opacity:.92;margin:18px 0 26px}
+.cta{display:inline-flex;align-items:center;gap:10px;background:#F7E2C0;color:#2A1720;font-weight:600;padding:12px 22px;border-radius:99px;text-decoration:none;box-shadow:0 4px 14px rgba(0,0,0,.18)}
+.cta:hover{background:#D6AB65}
+@media (max-width:820px){
+ .hw-d{display:none}.hw-m{display:block}
+ .hero{min-height:0;display:flex;flex-direction:column}
+ .hero-photo{position:relative;inset:auto;width:100%;height:280px;object-position:60% 25%}
+ .hero-wave{inset:auto;top:230px;width:100%;height:70px;filter:drop-shadow(0 -8px 12px rgba(30,8,18,.4))}
+ .hero-in{padding-block:4px 104px;background:#541D35}
+ .hero-in>div{max-width:none}
+ .brand{position:absolute;top:-250px;left:max(16px,env(safe-area-inset-left,0px));background:rgba(84,29,53,.82);padding:6px 12px 6px 8px;border-radius:99px}
+}
+
+/* faixa de números */
+.board{position:relative;z-index:3;margin-top:-80px;background:var(--surface);border:1px solid var(--line);border-radius:20px;box-shadow:var(--shadow);padding:20px clamp(16px,3vw,28px) 24px}
+.board-h{display:flex;flex-wrap:wrap;gap:12px 20px;align-items:center;justify-content:space-between;margin-bottom:18px}
+.board-h h2{font-size:20px}
+.seg{display:inline-flex;background:var(--surface-2);border-radius:99px;padding:4px;gap:2px;flex-wrap:wrap}
+.seg button{font:inherit;font-size:14px;border:0;background:transparent;color:var(--ink);padding:8px 14px;border-radius:99px;cursor:pointer}
+.seg button[aria-pressed="true"]{background:var(--wine);color:var(--on-wine);font-weight:600}
+.stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:0}
+.stat{padding:6px 18px;border-left:1px solid var(--line);min-width:0}
+.stat:first-child{border-left:0;padding-left:0}
+.stat .v{font-family:var(--f-display);font-size:clamp(30px,3.4vw,42px);font-weight:600;line-height:1.05;color:var(--wine)}
+.stat .v small{font-size:.5em;font-weight:600}
+.stat p{margin:8px 0 0;font-size:14px;color:var(--ink-2);line-height:1.45}
+.stat .tag{display:inline-block;margin-top:8px;font-size:11px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;padding:2px 8px;border-radius:99px;background:var(--surface-2);color:var(--ink-2)}
+.stat .tag.est{background:var(--wine-soft);color:var(--wine)}
+@media (max-width:900px){.stats{grid-template-columns:repeat(2,minmax(0,1fr));row-gap:20px}.stat:nth-child(3){border-left:0;padding-left:0}}
+@media (max-width:480px){.stats{grid-template-columns:minmax(0,1fr)}.stat{border-left:0;padding-left:0;border-top:1px solid var(--line);padding-top:16px}.stat:first-child{border-top:0;padding-top:0}}
+
+/* blocos */
+main{display:flex;flex-direction:column;gap:56px;padding-block:56px 32px}
+.block{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,7fr);gap:32px;align-items:start}
+.block.rev{grid-template-columns:minmax(0,7fr) minmax(0,5fr)}
+.block.rev .txt{order:2}
+@media (max-width:860px){.block,.block.rev{grid-template-columns:minmax(0,1fr)}.block.rev .txt{order:0}}
+.txt h2{font-size:clamp(26px,3vw,34px);line-height:1.12;margin:6px 0 14px}
+.txt p{margin:0 0 12px;max-width:60ch}
+.quote{font-family:var(--f-display);font-size:clamp(20px,2.2vw,24px);line-height:1.3;color:var(--wine);border-left:3px solid var(--gold);padding-left:16px;margin:18px 0 0}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:20px;box-shadow:var(--shadow);min-width:0}
+.panel h3{font-family:var(--f-body);font-size:15px;font-weight:600;margin-bottom:4px}
+.panel .sub{font-size:13px;color:var(--ink-2);margin:0 0 16px}
+.legend{display:flex;flex-wrap:wrap;gap:6px 16px;font-size:13px;color:var(--ink-2);margin-bottom:14px}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:6px;vertical-align:-1px}
+.note{font-size:12.5px;color:var(--ink-2);margin:14px 0 0}
+
+/* gráfico de barras pareadas */
+.pairs{display:flex;flex-direction:column;gap:12px}
+.pair{display:grid;grid-template-columns:34px minmax(0,1fr);gap:10px;align-items:center}
+.pair .uf{font-weight:600;font-size:13px}
+.bars{display:flex;flex-direction:column;gap:3px;min-width:0}
+.bar{display:flex;align-items:center;gap:8px;min-width:0}
+.bar span{height:12px;border-radius:0 4px 4px 0;flex-shrink:0;transition:width .5s ease}
+.bar b{font-size:12px;font-weight:500;color:var(--ink-2);white-space:nowrap}
+.bar.w span{background:var(--w-bar)} .bar.m span{background:var(--m-bar)}
+.flag{font-size:11px;color:var(--wine);font-weight:600;margin-left:4px}
+
+/* barra de direção empilhada */
+.stack{display:flex;height:46px;border-radius:8px;overflow:hidden;background:var(--surface-2)}
+.stack div{display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600}
+.stack .s1{background:var(--w-bar);color:var(--on-wine)}
+.stack .s2{background:var(--hidden-bar);color:#2A1720}
+.axis{display:flex;justify-content:space-between;font-size:11px;color:var(--ink-2);margin-top:6px}
+.couple{margin-top:22px;display:grid;grid-template-columns:repeat(20,minmax(0,1fr));gap:4px}
+.couple i{aspect-ratio:1;border-radius:50%;background:var(--m-bar)}
+.couple i.f{background:var(--w-bar)}
+.ufrank{margin-top:20px;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+.ufrank div{background:var(--surface-2);border-radius:10px;padding:8px 10px;font-size:13px}
+.ufrank b{display:block;font-family:var(--f-display);font-size:20px;color:var(--wine)}
+@media (max-width:480px){.ufrank{grid-template-columns:repeat(2,minmax(0,1fr))}}
+
+/* valor */
+.money{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.money>div{border-radius:12px;padding:16px;background:var(--surface-2);min-width:0}
+.money .v{font-family:var(--f-display);font-size:30px;font-weight:600;color:var(--leaf);line-height:1.1}
+.money p{margin:6px 0 0;font-size:13.5px;color:var(--ink-2)}
+.money .big{grid-column:1/-1;background:var(--leaf-soft)}
+.money .big .v{font-size:40px}
+@media (max-width:480px){.money{grid-template-columns:minmax(0,1fr)}}
+
+/* ressalvas */
+.fine{background:var(--surface-2);border-radius:20px;padding:28px clamp(16px,3vw,32px)}
+.fine h2{font-size:24px;margin-bottom:14px}
+.fine ul{margin:0;padding-left:20px;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px 32px;font-size:14px;color:var(--ink-2)}
+@media (max-width:760px){.fine ul{grid-template-columns:minmax(0,1fr)}}
+.fine li{min-width:0}
+footer{padding-block:28px 40px;font-size:13px;color:var(--ink-2);display:flex;flex-wrap:wrap;gap:12px 24px;justify-content:space-between;align-items:center}
+footer .cta{background:var(--wine);color:var(--on-wine);box-shadow:none}
+footer .cta:hover{background:var(--wine-2)}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+
+<header class="hero">
+  <img class="hero-photo" src="hero.jpg" srcset="hero-sm.jpg 768w, hero.jpg 1536w" sizes="(max-width:820px) 100vw, 62vw" alt="Agricultora sorrindo entre pés de café carregados de frutos maduros, com morros cultivados ao fundo">
+  <svg class="hero-wave hw-d" viewBox="0 0 600 600" preserveAspectRatio="none" aria-hidden="true"><path d="M0 0H560C470 90 610 200 520 300C430 400 600 470 500 600H0Z"/></svg>
+  <svg class="hero-wave hw-m" viewBox="0 0 600 70" preserveAspectRatio="none" aria-hidden="true"><path d="M0 40C120 0 230 10 330 34C430 58 520 50 600 18V70H0Z"/></svg>
+  <div class="hero-in"><div>
+    <a class="brand" href="atlas/" aria-label="Abrir o Atlas das Mulheres do Café">
+      <svg viewBox="0 0 48 48" aria-hidden="true"><path d="M24 44C14 36 9 27 11 17c6 2 11 7 13 15 2-8 7-13 13-15 2 10-3 19-13 27z" fill="#A9C47E"/><ellipse cx="18" cy="12" rx="5.5" ry="6.5" fill="#E58DAE"/><ellipse cx="29" cy="9" rx="5.5" ry="6.5" fill="#F7E2C0"/></svg>
+      <b>Atlas das<br>Mulheres do Café</b>
+    </a>
+    <h1>O café que elas fazem e <em>as estatísticas não contam</em></h1>
+    <p>Estima-se que mais de 100 mil mulheres trabalhem no café da família sem serem reconhecidas como produtoras. Os dados do IBGE mostram onde está esse trabalho e quanto ele vale.</p>
+    <a class="cta" href="atlas/">Explorar o Atlas completo <span aria-hidden="true">→</span></a>
+  </div></div>
+</header>
+
+<div class="in">
+  <section class="board" aria-labelledby="board-t">
+    <div class="board-h">
+      <h2 id="board-t">O trabalho invisível em quatro números</h2>
+      <div class="seg" role="group" aria-label="Recorte dos estabelecimentos">
+        <button type="button" id="r-onde" aria-pressed="true">Onde há café</button>
+        <button type="button" id="r-princ" aria-pressed="false">Café como atividade principal</button>
+      </div>
+    </div>
+    <div class="stats">
+      <div class="stat">
+        <div class="v num" id="k1">116 mil</div>
+        <p>mulheres trabalham no café da família sem serem registradas como produtoras</p>
+        <span class="tag est" id="t1">estimativa</span>
+      </div>
+      <div class="stat">
+        <div class="v num">1 em 2</div>
+        <p>mulheres que dirigem o estabelecimento ficam fora das estatísticas por sexo</p>
+        <span class="tag">Censo Agro 2017</span>
+      </div>
+      <div class="stat">
+        <div class="v num">2×</div>
+        <p>mais horas em afazeres domésticos e cuidados do que os homens: 22 contra 11 por semana</p>
+        <span class="tag">PNAD Contínua 2022</span>
+      </div>
+      <div class="stat">
+        <div class="v num" id="k4">R$ 2,4 <small>bi/ano</small></div>
+        <p>é quanto valeria esse trabalho não pago, na lavoura e em casa, a um salário mínimo</p>
+        <span class="tag est" id="t4">estimativa</span>
+      </div>
+    </div>
+  </section>
+</div>
+
+<main class="in">
+  <section class="block" aria-labelledby="b1">
+    <div class="txt">
+      <span class="eyebrow">Na lavoura</span>
+      <h2 id="b1">Quase um terço da mão de obra familiar do café é feminina</h2>
+      <p>O Censo Agro conta quem trabalha no estabelecimento com laço de parentesco com o produtor. No café, as mulheres são <strong class="num" id="pct-fam">29%</strong> dessa mão de obra. Entre quem é registrado como produtor, elas são poucas.</p>
+      <p>Há mais mulheres trabalhando no café da própria família do que mulheres contratadas: cerca de 49,5 mil, entre permanentes, temporárias e parceiras.</p>
+    </div>
+    <div class="panel">
+      <h3>Mão de obra familiar com 14 anos ou mais, por estado</h3>
+      <p class="sub" id="b1-sub">Estabelecimentos com café (estimativa). Os seis estados com mais mulheres.</p>
+      <div class="legend"><span><i style="background:var(--w-bar)"></i>Mulheres</span><span><i style="background:var(--m-bar)"></i>Homens</span></div>
+      <div class="pairs" id="pairs"></div>
+      <p class="note" id="b1-note">Em Rondônia, o café conilon divide a propriedade com outras atividades. Por isso, no recorte "café como atividade principal", o estado aparece quase vazio.</p>
+    </div>
+  </section>
+
+  <section class="block rev" aria-labelledby="b2">
+    <div class="txt">
+      <span class="eyebrow">Na direção</span>
+      <h2 id="b2">Quando o casal dirige junto, quase sempre só ele aparece</h2>
+      <p>O Censo registra um único produtor por estabelecimento, e todas as tabelas por sexo usam esse registro. Quando a direção é do casal, quem é anotado como produtor costuma ser o homem.</p>
+      <p>Somando as que dirigem sozinhas e as que dirigem com o marido, as mulheres estão na direção de 26% dos estabelecimentos. As estatísticas por sexo mostram só 13%.</p>
+      <p class="quote">Quando o casal dirige junto, 85% das vezes só o homem é registrado como produtor.</p>
+    </div>
+    <div class="panel">
+      <h3>Presença das mulheres na direção dos estabelecimentos</h3>
+      <p class="sub">Lavouras permanentes nos municípios cafeeiros, % dos estabelecimentos</p>
+      <div class="legend"><span><i style="background:var(--w-bar)"></i>Registrada como produtora</span><span><i style="background:var(--hidden-bar)"></i>Dirige com o marido, ele é registrado</span></div>
+      <div class="stack" role="img" aria-label="13,1% registradas como produtoras e mais 13,0% que dirigem com o marido sem registro, total de 26%">
+        <div class="s1" style="width:43.7%">13,1%</div><div class="s2" style="width:43.3%">13,0%</div>
+      </div>
+      <div class="axis"><span>0%</span><span>30%</span></div>
+      <div class="couple" role="img" aria-label="De cada 20 casais que dirigem juntos, 17 têm o homem registrado e 3 a mulher" id="couple"></div>
+      <p class="note">Cada ponto é 1 em cada 20 estabelecimentos dirigidos pelo casal: 17 têm o homem registrado como produtor, 3 têm a mulher.</p>
+      <div class="ufrank" aria-label="Parcela de mulheres dirigentes que ficam fora das estatísticas, por estado">
+        <div><b class="num">56%</b>Minas Gerais</div><div><b class="num">57%</b>Espírito Santo</div><div><b class="num">58%</b>Rondônia</div><div><b class="num">28%</b>Bahia</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="block" aria-labelledby="b3">
+    <div class="txt">
+      <span class="eyebrow">Em casa e no valor</span>
+      <h2 id="b3">A jornada não termina na lavoura</h2>
+      <p>Nos estados do café, as mulheres dedicam em média 22 horas por semana a afazeres domésticos e ao cuidado de pessoas. Os homens dedicam 11.</p>
+      <p>Pagas a um salário mínimo, as horas de lavoura e de casa dessas mulheres somariam bilhões de reais por ano. É um piso: a diária da colheita costuma ser maior.</p>
+    </div>
+    <div class="panel">
+      <h3>Quanto vale o que não é pago</h3>
+      <p class="sub" id="b3-sub">Estabelecimentos com café (estimativa), por ano, a um salário mínimo de 2026</p>
+      <div class="money">
+        <div><div class="v num" id="m1">R$ 1,1 bi</div><p>trabalho na lavoura da família, sem registro, em meio período</p></div>
+        <div><div class="v num" id="m2">R$ 1,3 bi</div><p>afazeres domésticos e cuidados</p></div>
+        <div class="big"><div class="v num">R$ 8,4 bi</div><p>da produção de café de 2025 vem de estabelecimentos dirigidos por mulheres, que têm 8,4% da área</p></div>
+      </div>
+      <p class="note">O valor da lavoura varia de R$ 0,6 a 2,3 bi por ano conforme a dedicação suposta (3 meses, meio período ou tempo integral).</p>
+    </div>
+  </section>
+
+  <section class="fine" aria-labelledby="b4">
+    <h2 id="b4">Como chegamos a esses números</h2>
+    <ul>
+      <li>Dados públicos do IBGE: Censo Agropecuário 2017 (tabelas 6887, 6883 e 6768 do SIDRA), PNAD Contínua 2022 (tabela 7015) e PAM 2025.</li>
+      <li>"Café como atividade principal" usa o dado direto do Censo. "Onde há café" estende a conta aos 264 mil estabelecimentos com café e é uma estimativa.</li>
+      <li>O Censo não mede horas na lavoura. O valor usa o salário mínimo de 2026 (R$ 1.621) e supõe meio período ao longo do ano.</li>
+      <li>As horas domésticas são a média de todas as mulheres de cada estado. A PNAD não separa a área rural por estado nessa tabela.</li>
+      <li>O IBGE não publica o valor da produção por sexo. Os R$ 8,4 bi aplicam a parcela de área das mulheres ao valor da produção, supondo a mesma produtividade.</li>
+      <li>Meninas com menos de 14 anos que trabalham no café não entram em nenhum valor.</li>
+    </ul>
+  </section>
+
+  <footer>
+    <span>Fontes: IBGE (Censo Agropecuário 2017, PNAD Contínua 2022, PAM 2025). Valores estimados, versão preliminar de novembro de 2026.</span>
+    <a class="cta" href="atlas/">Ver mapas e organizações no Atlas <span aria-hidden="true">→</span></a>
+  </footer>
+</main>
+
+<script>
+const D={
+  onde:{k1:'116 mil',k4:'R$ 2,4 <small>bi/ano</small>',m1:'R$ 1,1 bi',m2:'R$ 1,3 bi',pct:'29%',est:true,
+    sub1:'Estabelecimentos com café (estimativa). Os seis estados com mais mulheres.',
+    sub3:'Estabelecimentos com café (estimativa), por ano, a um salário mínimo de 2026',
+    uf:[['MG',60839,173157],['ES',50711,106407],['BA',13543,27707],['RO',13166,23870],['PR',4304,12518],['SP',3119,13744]]},
+  princ:{k1:'68 mil',k4:'R$ 1,4 <small>bi/ano</small>',m1:'R$ 0,7 bi',m2:'R$ 0,7 bi',pct:'29%',est:false,
+    sub1:'Estabelecimentos com café como atividade principal (dado direto do Censo).',
+    sub3:'Estabelecimentos com café como atividade principal, por ano, a um salário mínimo de 2026',
+    uf:[['MG',53503,136844],['ES',14090,27570],['BA',6959,13208],['PR',3702,8033],['SP',3038,10427],['RO',119,234]]}
+};
+const fmt=n=>n.toLocaleString('pt-BR');
+const $=id=>document.getElementById(id);
+function render(key){
+  const d=D[key];
+  $('k1').textContent=d.k1; $('k4').innerHTML=d.k4; $('m1').textContent=d.m1; $('m2').textContent=d.m2;
+  $('pct-fam').textContent=d.pct; $('b1-sub').textContent=d.sub1; $('b3-sub').textContent=d.sub3;
+  ['t1','t4'].forEach(t=>{const el=$(t); el.textContent=d.est?'estimativa':'Censo Agro 2017'; el.classList.toggle('est',d.est)});
+  const max=Math.max(...d.uf.map(r=>r[2]));
+  $('pairs').innerHTML=d.uf.map(([uf,m,h])=>{
+    const pm=100*m/(m+h);
+    return `<div class="pair"><span class="uf">${uf}</span><div class="bars">
+      <div class="bar w"><span style="width:${(70*m/max).toFixed(1)}%"></span><b class="num">${fmt(m)} · ${pm.toFixed(0)}%${uf==='RO'&&key==='princ'?'<span class="flag">subcontado</span>':''}</b></div>
+      <div class="bar m"><span style="width:${(70*h/max).toFixed(1)}%"></span><b class="num">${fmt(h)}</b></div></div></div>`}).join('');
+  $('r-onde').setAttribute('aria-pressed',key==='onde'); $('r-princ').setAttribute('aria-pressed',key==='princ');
+  try{localStorage.setItem('recorte',key)}catch(e){}
+}
+$('couple').innerHTML=Array.from({length:20},(_,i)=>`<i class="${i<3?'f':''}"></i>`).join('');
+$('r-onde').addEventListener('click',()=>render('onde'));
+$('r-princ').addEventListener('click',()=>render('princ'));
+let start='onde'; try{const s=localStorage.getItem('recorte'); if(s&&D[s]) start=s}catch(e){}
+render(start);
+</script>

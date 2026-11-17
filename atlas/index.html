@@ -1,0 +1,724 @@
+<meta charset="utf-8">
+<title>Atlas das Mulheres do Café</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap">
+<style>
+/* Layout: barra superior fixa + trilho lateral nas páginas internas; conteúdo em grade de cartões; mapa em SVG com zoom */
+:root{
+  --bg:#F7F1E8; --surface:#FFFDF9; --surface-2:#F0E8DC; --line:#E6D9C8;
+  --ink:#2A1720; --ink-2:#6B5560; --wine:#541D35; --wine-2:#842E50; --wine-soft:#F2E2E8;
+  --leaf:#285C3A; --leaf-2:#799B52; --cherry:#842E50; --gold:#D6AB65; --on-wine:#FBF3EE;
+  --c0:#EEF2E0; --c1:#D3E1B4; --c2:#A8C47E; --c3:#799B52; --c4:#4C7A45; --c5:#285C3A; --nodata:#EAE2D7;
+  --shadow:0 1px 2px rgba(60,20,35,.06),0 6px 18px rgba(60,20,35,.06);
+  --f-display:"Fraunces",Georgia,"Times New Roman",serif; --f-body:"Inter",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --r:12px;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#181013; --surface:#22171B; --surface-2:#2C1F24; --line:#3A2A30; --ink:#F3E8E6; --ink-2:#BFA9B1;
+  --wine:#D98AAA; --wine-2:#E9A4C0; --wine-soft:#3A2230; --leaf:#8FC59A; --leaf-2:#A9C47E; --cherry:#E58DAE; --gold:#E0BA7A; --on-wine:#1B1014;
+  --c0:#2A3325; --c1:#34472B; --c2:#3F6131; --c3:#5A8540; --c4:#7FAE5C; --c5:#B0D88E; --nodata:#2E2427;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 6px 18px rgba(0,0,0,.25); color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#181013; --surface:#22171B; --surface-2:#2C1F24; --line:#3A2A30; --ink:#F3E8E6; --ink-2:#BFA9B1;
+  --wine:#D98AAA; --wine-2:#E9A4C0; --wine-soft:#3A2230; --leaf:#8FC59A; --leaf-2:#A9C47E; --cherry:#E58DAE; --gold:#E0BA7A; --on-wine:#1B1014;
+  --c0:#2A3325; --c1:#34472B; --c2:#3F6131; --c3:#5A8540; --c4:#7FAE5C; --c5:#B0D88E; --nodata:#2E2427;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 6px 18px rgba(0,0,0,.25); color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.5}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--surface)}
+a{color:var(--wine)}
+h1,h2,h3{font-family:var(--f-display);font-weight:600;text-wrap:balance;margin:0;letter-spacing:-.01em}
+button,select,input{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--wine-2);outline-offset:2px}
+.num{font-variant-numeric:tabular-nums}
+
+/* topo */
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:var(--surface);border-bottom:1px solid var(--line)}
+.top-in{display:flex;align-items:center;gap:24px;padding-block:10px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));max-width:1360px;margin:0 auto}
+.brand{display:flex;align-items:center;gap:10px;text-decoration:none;color:var(--wine);flex-shrink:0}
+.brand svg{width:38px;height:38px}
+.brand b{font-family:var(--f-display);font-size:19px;line-height:1.02;font-weight:600}
+.brand b span{display:block;font-size:13px;font-weight:400;color:var(--ink-2)}
+.nav{display:flex;gap:4px;margin-left:auto;overflow-x:auto;scrollbar-width:none}
+.nav a{padding:8px 12px;border-radius:8px;text-decoration:none;color:var(--ink);font-size:14px;white-space:nowrap}
+.nav a:hover{background:var(--surface-2)}
+.nav a[aria-current="page"]{color:var(--wine);font-weight:600;box-shadow:inset 0 -2px 0 var(--wine)}
+
+/* casca interna */
+.wrap{max-width:1360px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:20px 48px}
+.shell{display:grid;grid-template-columns:200px minmax(0,1fr);gap:24px;align-items:start}
+.rail{position:sticky;top:calc(env(safe-area-inset-top,0px) + 76px);display:flex;flex-direction:column;gap:2px}
+.rail a,.rail span{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:9px;text-decoration:none;color:var(--ink);font-size:14px}
+.rail a:hover{background:var(--surface-2)}
+.rail a[aria-current="page"]{background:var(--wine);color:var(--on-wine)}
+.rail span{color:var(--ink-2);opacity:.75}
+.rail small{font-size:11px;margin-left:auto;border:1px solid var(--line);border-radius:99px;padding:0 6px}
+.rail svg{width:17px;height:17px;flex-shrink:0}
+@media (max-width:900px){.shell{grid-template-columns:minmax(0,1fr)}.rail{position:static;flex-direction:row;overflow-x:auto;scrollbar-width:none}.rail a,.rail span{white-space:nowrap}}
+
+.page-h{display:flex;flex-wrap:wrap;align-items:end;justify-content:space-between;gap:12px;margin-bottom:16px}
+.page-h h1{font-size:clamp(24px,3vw,32px);color:var(--ink)}
+.page-h p{margin:4px 0 0;color:var(--ink-2)}
+.filters{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.sel{appearance:none;background:var(--surface) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' fill='none' stroke='%23866' stroke-width='1.6'/%3E%3C/svg%3E") no-repeat right 10px center;border:1px solid var(--line);border-radius:9px;padding:8px 32px 8px 12px;font-size:14px;max-width:100%}
+.inp{background:var(--surface);border:1px solid var(--line);border-radius:9px;padding:9px 12px;font-size:14px;min-width:0;width:100%}
+.lbl{font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-2);font-weight:600}
+
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow);padding:18px;min-width:0}
+.card h2{font-size:19px;margin-bottom:12px}
+.grid{display:grid;gap:16px}
+.g2{grid-template-columns:repeat(2,minmax(0,1fr))}
+.g-5-7{grid-template-columns:5fr 7fr}
+@media (max-width:900px){.g2,.g-5-7{grid-template-columns:minmax(0,1fr)}}
+
+.kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-bottom:16px}
+@media (max-width:900px){.kpis{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.kpi{display:flex;gap:12px;align-items:flex-start;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:14px 16px;box-shadow:var(--shadow);min-width:0}
+.kpi .ic{width:40px;height:40px;border-radius:50%;display:grid;place-items:center;background:var(--wine-soft);color:var(--wine);flex-shrink:0}
+.kpi .ic.g{background:var(--c0);color:var(--leaf)}
+.kpi .ic svg{width:21px;height:21px}
+.kpi b{display:block;font-family:var(--f-display);font-size:26px;line-height:1.1;font-weight:700;font-variant-numeric:tabular-nums}
+.kpi span{display:block;font-size:13px;color:var(--ink-2);line-height:1.3}
+.note{font-size:12.5px;color:var(--ink-2);margin-top:10px;line-height:1.45}
+.tag{display:inline-flex;align-items:center;gap:6px;font-size:12px;padding:2px 9px;border-radius:99px;background:var(--wine-soft);color:var(--wine);font-weight:600;white-space:nowrap}
+.tag.g{background:var(--c0);color:var(--leaf)}
+.tag.o{background:var(--surface-2);color:var(--ink-2)}
+
+.tabs{display:inline-flex;border:1px solid var(--line);border-radius:9px;overflow:hidden;margin-bottom:12px;max-width:100%;overflow-x:auto}
+.tabs button{border:0;background:transparent;padding:6px 14px;font-size:13px;cursor:pointer;white-space:nowrap}
+.tabs button[aria-pressed="true"]{background:var(--wine);color:var(--on-wine)}
+
+/* barras */
+.bars{display:flex;flex-direction:column;gap:10px}
+.bar{display:grid;grid-template-columns:110px minmax(0,1fr) 56px;gap:10px;align-items:center;font-size:14px}
+.bar .t{height:16px;background:var(--surface-2);border-radius:4px;overflow:hidden;position:relative}
+.bar .t i{display:block;height:100%;background:var(--leaf-2);border-radius:4px}
+.bar .t em{position:absolute;top:-3px;bottom:-3px;width:2px;background:var(--ink-2);opacity:.8}
+.bar .v{text-align:right;font-variant-numeric:tabular-nums;font-weight:600}
+.pair{display:grid;grid-template-columns:150px minmax(0,1fr);gap:4px 12px;align-items:center;font-size:14px;margin-bottom:12px}
+.pair>span{grid-row:span 2}
+.pair .r{display:grid;grid-template-columns:minmax(0,1fr) 54px;gap:8px;align-items:center}
+.pair .t{height:13px;background:var(--surface-2);border-radius:4px;overflow:hidden}
+.pair .t i{display:block;height:100%;border-radius:4px}
+.pair .m i{background:var(--wine-2)}.pair .h i{background:#B9AEA6}
+.pair b{font-variant-numeric:tabular-nums;text-align:right;font-size:13px}
+.g3m{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px}
+.mlist{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:4px}
+.mlink{display:flex;flex-direction:column;align-items:flex-start;gap:2px;width:100%;text-align:left;background:none;border:0;border-radius:8px;padding:8px 10px;cursor:pointer;font:inherit;color:var(--ink)}
+.mlink:hover{background:var(--surface-2)}.mlink span{font-size:12.5px;color:var(--ink-2)}
+.linkbtn{display:inline;flex-direction:row;padding:0;color:var(--wine);text-decoration:underline;width:auto}
+.hcard .hic{display:inline-flex;width:40px;height:40px;border-radius:12px;background:var(--surface-2);align-items:center;justify-content:center;color:var(--wine);margin-bottom:6px}.hcard .hic svg{width:20px;height:20px}
+.hcard p{color:var(--ink-2);font-size:14.5px;margin:0}
+.split{display:grid;grid-template-columns:120px minmax(0,1fr);gap:10px;align-items:center;font-size:14px}
+.split .t{display:flex;height:22px;border-radius:5px;overflow:hidden;font-size:12px;font-weight:600;font-variant-numeric:tabular-nums}
+.split .t i{display:flex;align-items:center;font-style:normal;padding:0 7px;white-space:nowrap}
+.split .t .m{background:var(--wine-2);color:#fff}.split .t .h{background:#D9D0C8;color:#3b2a2a;justify-content:flex-end;flex:1}
+@media (max-width:480px){.split{grid-template-columns:minmax(0,1fr);gap:4px}}
+.pcount{font-size:13.5px;color:var(--ink-2);margin:-2px 0 14px}.pcount b{font-family:var(--f-display);font-size:22px;color:var(--wine);font-weight:700}
+.key{display:flex;gap:16px;font-size:13px;color:var(--ink-2);margin:-4px 0 14px}.key i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:6px;vertical-align:-1px}
+.sint{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;margin:0 0 16px}
+.sint>div{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:16px;display:flex;flex-direction:column;gap:6px}
+.sint .lbl{font-size:11.5px}
+.sint b.big{font-family:var(--f-display);font-size:30px;line-height:1.05;color:var(--wine);font-variant-numeric:tabular-nums}
+.sint p{font-size:13.5px;color:var(--ink-2);margin:0}
+.sint .cmp{font-size:12.5px;color:var(--ink-2);border-top:1px dashed var(--line);padding-top:6px;margin-top:auto}
+.sint .gauge{height:8px;border-radius:4px;background:var(--surface-2);position:relative;overflow:hidden}.sint .gauge i{position:absolute;left:0;top:0;bottom:0;background:var(--wine-2);border-radius:4px}
+
+@media (max-width:480px){.sint{grid-template-columns:minmax(0,1fr)}}
+.esp2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+.espc{border-top:5px solid var(--leaf);}
+.espc.cane{border-top-color:var(--gold)}
+.espc .big{font-family:var(--f-display);font-size:34px;font-weight:700;color:var(--wine);line-height:1.1}
+.espc .sub{color:var(--ink-2);font-size:13.5px;margin-bottom:14px}
+.mini{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin:8px 0 16px}
+.mini div{background:var(--surface-2);border-radius:10px;padding:10px}
+.mini b{display:block;font-size:19px;font-variant-numeric:tabular-nums}.mini span{font-size:12px;color:var(--ink-2)}
+@media (max-width:820px){.esp2{grid-template-columns:minmax(0,1fr)}}
+@media (max-width:420px){.mini{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.sec-h{margin:34px 0 14px;padding-top:20px;border-top:1px solid var(--line)}
+.sec-h h2{font-size:22px}.sec-h p{color:var(--ink-2);margin-top:4px}
+@media (max-width:560px){.pair{grid-template-columns:minmax(0,1fr)}.pair>span{grid-row:auto}}
+
+/* donut */
+.donut{display:grid;grid-template-columns:170px minmax(0,1fr);gap:18px;align-items:center}
+@media (max-width:480px){.donut{grid-template-columns:minmax(0,1fr)}.donut svg{max-width:170px;margin:0 auto}}
+.legend{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:7px;font-size:13.5px}
+.legend li{display:grid;grid-template-columns:12px minmax(0,1fr) auto;gap:8px;align-items:center}
+.legend i{width:12px;height:12px;border-radius:50%}
+
+/* início */
+.hero{position:relative;background:var(--wine);color:#FBF3EE;border-radius:0 0 28px 28px;overflow:hidden;min-height:clamp(440px,46vw,580px);isolation:isolate}
+.hero-photo{position:absolute;inset:0 0 0 auto;width:64%;height:100%;object-fit:cover;object-position:62% 30%;z-index:0}
+.hero-wave{position:absolute;inset:0 auto 0 0;width:52%;height:100%;z-index:1;filter:drop-shadow(14px 0 18px rgba(30,8,18,.45)) drop-shadow(4px 0 4px rgba(30,8,18,.3))}
+.hero-wave path{fill:#541D35}
+.hw-m{display:none}
+@media (max-width:820px){.hw-d{display:none}.hw-m{display:block}}
+.hero-in{position:relative;z-index:2;max-width:1360px;margin:0 auto;padding-left:max(24px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:56px 130px}
+.hero-in>div{max-width:min(500px,42vw)}
+.hero h1{font-size:clamp(34px,4.6vw,58px);line-height:1.04;font-weight:600;color:#FBF3EE}
+.hero p{max-width:40ch;font-size:17px;opacity:.92;margin:18px 0 26px}
+.cta{display:inline-flex;align-items:center;gap:10px;background:#F7E2C0;color:#2A1720;font-weight:600;padding:12px 22px;border-radius:99px;text-decoration:none;box-shadow:0 4px 14px rgba(0,0,0,.18)}
+.cta:hover{background:#D6AB65}
+@media (max-width:820px){
+ .hero{min-height:0;display:flex;flex-direction:column}
+ .hero-photo{position:relative;inset:auto;width:100%;height:300px;object-position:60% 25%}
+ .hero-wave{inset:auto;top:250px;width:100%;height:70px;filter:drop-shadow(0 -8px 12px rgba(30,8,18,.4))}
+ .hero-in{padding-block:8px 110px;background:#541D35}
+ .hero-in>div{max-width:none}
+}
+.mods{position:relative;margin:-78px auto 0;max-width:1180px;background:var(--surface);border:1px solid var(--line);border-radius:18px;box-shadow:var(--shadow);display:grid;grid-template-columns:repeat(5,minmax(0,1fr));z-index:2}
+.mods a{display:flex;gap:12px;align-items:center;padding:18px;text-decoration:none;color:var(--ink);border-right:1px solid var(--line)}
+.mods a:last-child{border-right:0}
+.mods a:hover{background:var(--surface-2)}
+.mods svg{width:28px;height:28px;color:var(--wine);flex-shrink:0}
+.mods b{display:block;font-size:14px}.mods span{font-size:12.5px;color:var(--ink-2)}
+@media (max-width:980px){.mods{grid-template-columns:repeat(2,minmax(0,1fr))}.mods a{border-right:0;border-bottom:1px solid var(--line)}}
+@media (max-width:480px){.mods{grid-template-columns:minmax(0,1fr)}}
+.home-sec{max-width:1180px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:36px}
+.big-nums{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:24px}
+.big-nums div{border-top:2px solid var(--wine);padding-top:12px}
+.big-nums b{font-family:var(--f-display);font-size:clamp(30px,4vw,44px);color:var(--wine);display:block;line-height:1.05;font-variant-numeric:tabular-nums}
+.big-nums span{color:var(--ink-2);font-size:14px}
+@media (max-width:820px){.big-nums{grid-template-columns:repeat(2,minmax(0,1fr))}}
+
+/* mapa */
+.mapbox{position:relative;background:var(--surface-2);border-radius:10px;overflow:hidden;height:min(68vh,620px);min-height:380px}
+.mapbox svg{width:100%;height:100%;display:block;cursor:grab;touch-action:none}
+.mapbox .zoom{position:absolute;left:10px;top:10px;display:flex;flex-direction:column;background:var(--surface);border:1px solid var(--line);border-radius:8px;overflow:hidden}
+.mapbox .zoom button{border:0;background:transparent;width:34px;height:34px;font-size:18px;cursor:pointer}
+.mapbox .zoom button+button{border-top:1px solid var(--line)}
+.tip{position:absolute;pointer-events:auto;background:var(--surface);border:1px solid var(--line);border-radius:10px;box-shadow:var(--shadow);padding:12px 14px;font-size:13px;min-width:210px;max-width:260px;z-index:3}
+.tip h3{font-family:var(--f-body);font-size:14px;font-weight:700;margin-bottom:6px}
+.tip dl{display:grid;grid-template-columns:1fr auto;gap:2px 12px;margin:0}
+.tip dd{margin:0;text-align:right;font-variant-numeric:tabular-nums;font-weight:600}
+.tip button{margin-top:8px;border:0;background:none;color:var(--wine);font-weight:600;padding:0;cursor:pointer;text-decoration:underline}
+.scale{display:flex;flex-direction:column;gap:6px;font-size:13px}
+.scale li{display:flex;gap:8px;align-items:center}.scale i{width:22px;height:14px;border-radius:3px;display:inline-block}
+.map-layout{display:grid;grid-template-columns:minmax(0,1fr) 220px;gap:16px}
+@media (max-width:900px){.map-layout{grid-template-columns:minmax(0,1fr)}}
+
+/* organizações */
+.org-layout{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,6fr);gap:16px;align-items:start}
+@media (max-width:980px){.org-layout{grid-template-columns:minmax(0,1fr)}}
+.org-list{display:flex;flex-direction:column;max-height:640px;overflow:auto}
+.org{display:grid;grid-template-columns:44px minmax(0,1fr) auto;gap:12px;align-items:center;padding:12px 6px;border-bottom:1px solid var(--line);cursor:pointer;background:none;border-left:0;border-right:0;border-top:0;text-align:left;width:100%}
+.org:hover{background:var(--surface-2)}
+.org .av{width:44px;height:44px;border-radius:50%;display:grid;place-items:center;background:var(--wine-soft);color:var(--wine)}
+.org .av svg{width:22px;height:22px}
+.org b{display:block;font-size:14px;line-height:1.3}
+.org small{display:block;color:var(--ink-2);font-size:12.5px}
+.org .chev{color:var(--ink-2)}
+
+/* perfil */
+.prof-hero{background:var(--wine);color:var(--on-wine);border-radius:16px;padding:28px;display:grid;grid-template-columns:96px minmax(0,1fr);gap:20px;align-items:center;position:relative;overflow:hidden}
+.prof-hero .logo{width:96px;height:96px;border-radius:50%;background:var(--surface);display:grid;place-items:center}
+.prof-hero h1{font-size:clamp(24px,3.4vw,36px);color:var(--on-wine)}
+.prof-hero .meta{display:flex;flex-wrap:wrap;gap:8px 20px;margin-top:10px;font-size:14px;opacity:.92}
+.prof-hero .crumb{font-size:13px;opacity:.8;margin-bottom:6px}
+.prof-hero .crumb a{color:inherit}
+@media (max-width:560px){.prof-hero{grid-template-columns:minmax(0,1fr)}.prof-hero .logo{width:72px;height:72px}}
+.acts{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:12px}
+.sel{max-width:100%;min-width:0;text-overflow:ellipsis}
+.page-h>*,.filters{min-width:0;max-width:100%}
+@media (max-width:640px){#mind{width:100%}}
+@media (max-width:640px){.mapbox{height:auto;aspect-ratio:1/1;min-height:300px}}
+.acts div{text-align:center;font-size:13px;overflow-wrap:anywhere;hyphens:auto;padding:12px 8px;border:1px solid var(--line);border-radius:10px}
+.acts svg{width:28px;height:28px;color:var(--wine);display:block;margin:0 auto 6px}
+dl.facts{display:grid;grid-template-columns:minmax(0,160px) minmax(0,1fr);gap:8px 14px;margin:0;font-size:14px}
+dl.facts dt{color:var(--ink-2)}dl.facts dd{margin:0;min-width:0;overflow-wrap:anywhere}
+
+.find{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:10px;font-size:14px}
+.find li{display:grid;grid-template-columns:20px minmax(0,1fr);gap:8px}
+.find svg{width:18px;height:18px;margin-top:2px}
+.find .ok{color:var(--leaf)}.find .warn{color:var(--cherry)}
+.muni-search{position:relative;max-width:360px;width:100%}
+.sugg{position:absolute;left:0;right:0;top:100%;background:var(--surface);border:1px solid var(--line);border-radius:9px;box-shadow:var(--shadow);margin-top:4px;max-height:260px;overflow:auto;z-index:5;list-style:none;padding:4px}
+.sugg button{width:100%;text-align:left;border:0;background:none;padding:8px 10px;border-radius:6px;cursor:pointer;font-size:14px}
+.sugg button:hover,.sugg button:focus{background:var(--surface-2)}
+.foot{border-top:1px solid var(--line);color:var(--ink-2);font-size:12.5px;padding-block:20px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));max-width:1360px;margin:0 auto}
+.loading{padding:60px 16px;text-align:center;color:var(--ink-2)}
+@media (prefers-reduced-motion:no-preference){.view{animation:fade .25s ease-out}@keyframes fade{from{opacity:.4;transform:translateY(4px)}to{opacity:1;transform:none}}}
+</style>
+
+<header class="top"><div class="top-in">
+  <a class="brand" href="#inicio" aria-label="Atlas das Mulheres do Café, início">
+    <svg viewBox="0 0 48 48" aria-hidden="true"><path d="M24 44C14 36 9 27 11 17c6 2 11 7 13 15 2-8 7-13 13-15 2 10-3 19-13 27z" fill="var(--leaf)"/><path d="M24 44V30" stroke="var(--surface)" stroke-width="1.5"/><ellipse cx="18" cy="12" rx="5.5" ry="6.5" fill="var(--cherry)"/><ellipse cx="29" cy="9" rx="5.5" ry="6.5" fill="var(--wine)"/><path d="M18 7.5v9M29 4.5v9" stroke="var(--surface)" stroke-width="1.3" opacity=".7"/></svg>
+    <b>Atlas das<br>Mulheres do Café</b>
+  </a>
+  <nav class="nav" aria-label="Seções">
+    <a href="#inicio" data-r="inicio">Início</a><a href="#panorama" data-r="panorama">Indicadores</a><a href="#mapa" data-r="mapa">Mapas</a><a href="#municipios" data-r="municipios">Municípios</a><a href="#organizacoes" data-r="organizacoes">Organizações</a><a href="#historias" data-r="historias">Histórias</a><a href="#sobre" data-r="sobre">Sobre</a>
+  </nav>
+</div></header>
+<main id="app"><div class="loading">Carregando dados do Atlas…</div></main>
+<footer class="foot">Protótipo em construção. Dados: IBGE, Censo Agropecuário 2017 (tabelas SIDRA 6955, 6768, 6883, 6776, 6779, 6851, 6869) e Produção Agrícola Municipal; parte dos dados foi trazida do <a href="https://www.embrapa.br/web/cafe/painel-cafe-em-numeros" target="_blank" rel="noopener">painel Café em Números</a> (Embrapa Café e Embrapa Territorial); mapeamento de organizações feito na web em nov/2026. Malhas municipais simplificadas a partir do IBGE.</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/topojson/3.0.2/topojson.min.js"></script>
+<script>
+(()=>{
+const $=(s,el=document)=>el.querySelector(s), app=$('#app');
+const fmt=new Intl.NumberFormat('pt-BR'), f1=v=>v==null?'–':v.toLocaleString('pt-BR',{minimumFractionDigits:1,maximumFractionDigits:1});
+const n0=v=>v==null?'–':fmt.format(Math.round(v)), pc=v=>v==null?'–':f1(v)+'%';
+const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const IC={
+ people:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="8" cy="8" r="3"/><circle cx="16.5" cy="9" r="2.5"/><path d="M2.5 19c.6-3.4 2.8-5 5.5-5s4.9 1.6 5.5 5M13.5 15.2c.9-.8 1.9-1.2 3-1.2 2.2 0 3.9 1.4 4.5 4"/></svg>',
+ woman:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="8" r="4"/><path d="M12 12v9M8.5 17.5h7"/></svg>',
+ pct:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M19 5 5 19"/><circle cx="7" cy="7" r="2.5"/><circle cx="17" cy="17" r="2.5"/></svg>',
+ sprout:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M12 21v-8M12 13c0-4 3-7 8-7 0 5-3 7-8 7zM12 15c0-3-2.5-5.5-7-5.5 0 4 2.5 5.5 7 5.5z"/></svg>',
+ chart:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>',
+ pin:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M12 21s7-6.2 7-11.5A7 7 0 0 0 5 9.5C5 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg>',
+ map:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="m3 6 6-2 6 2 6-2v14l-6 2-6-2-6 2zM9 4v14M15 6v14"/></svg>',
+ book:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M3 5c3-1 6-1 9 1 3-2 6-2 9-1v14c-3-1-6-1-9 1-3-2-6-2-9-1zM12 6v14"/></svg>',
+ leaf:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M4 20c0-9 6-15 16-16 0 10-6 16-16 16zM4 20l9-9"/></svg>',
+ search:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg>',
+ cal:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>',
+ cap:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="m2 9 10-5 10 5-10 5zM6 11v5c3 2 9 2 12 0v-5"/></svg>',
+ bean:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><ellipse cx="12" cy="12" rx="6" ry="8.5" transform="rotate(30 12 12)"/><path d="M9 5c4 4 2 10 6 14"/></svg>',
+ shop:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M4 9h16l-1 11H5zM8 9V7a4 4 0 0 1 8 0v2"/></svg>',
+ award:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="9" r="6"/><path d="m8.5 14-1.5 7 5-3 5 3-1.5-7"/></svg>',
+ check:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m5 12 4.5 4.5L19 7"/></svg>',
+ alert:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M12 7v6M12 16.5v.5"/></svg>',
+ link:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"/></svg>'
+};
+let D=null, MUN=[], byCod=new Map(), TOPO=null, UFTOPO=null;
+const ST={muni:3169406, org:null, geo:'BR1', ptab:'idade', ind:'pct_est', scale:'mun', otipo:'', ouf:'', oq:'', oesc:'Brasil', esp:''};
+try{const s=JSON.parse(localStorage.getItem('atlas-st')||'{}');Object.assign(ST,s)}catch(e){}
+const save=()=>{try{localStorage.setItem('atlas-st',JSON.stringify({muni:ST.muni,ind:ST.ind,geo:ST.geo}))}catch(e){}};
+const UFN={RO:'Rondônia',AC:'Acre',AM:'Amazonas',RR:'Roraima',PA:'Pará',AP:'Amapá',TO:'Tocantins',MA:'Maranhão',PI:'Piauí',CE:'Ceará',RN:'Rio Grande do Norte',PB:'Paraíba',PE:'Pernambuco',AL:'Alagoas',SE:'Sergipe',BA:'Bahia',MG:'Minas Gerais',ES:'Espírito Santo',RJ:'Rio de Janeiro',SP:'São Paulo',PR:'Paraná',SC:'Santa Catarina',RS:'Rio Grande do Sul',MS:'Mato Grosso do Sul',MT:'Mato Grosso',GO:'Goiás',DF:'Distrito Federal'};
+const UFCOD={};
+const IND={
+ esp:{t:'Espécie de café predominante',u:'cat'},
+ prio:{t:'Territórios prioritários (muitas mulheres, nenhuma organização)',u:'cat'},
+ ampl:{t:'Participação ampliada das mulheres na direção (% com dirigente mulher ou codireção)',u:'%',br:[10,15,20,30,40]},
+ codir:{t:'Índice de codireção (% dirigidos pelo casal)',u:'%',br:[5,10,15,25,35]},
+ env_m:{t:'Índice de envelhecimento das mulheres dirigentes',u:'x',br:[3,6,10,15,25]},
+ ipa:{t:'Índice de paridade no acesso (1 = paridade)',u:'x',br:[0.3,0.45,0.6,0.75,0.9]},
+ pct_est:{t:'Participação feminina estimada na direção dos estabelecimentos com café (%)',u:'%',br:[8,10,12,14,17]},
+ pct_estab:{t:'Participação feminina observada: café como atividade principal (%)',u:'%',br:[5,10,15,20,30]},
+ pct_area:{t:'Área de café dirigida por mulheres (%)',u:'%',br:[3,6,10,15,25]},
+ estab_m:{t:'Estabelecimentos de café dirigidos por mulheres',u:'n',br:[5,20,50,100,200]},
+ proxy_m:{t:'Mulheres dirigentes em estabelecimentos com café (estimativa, inclui canéfora)',u:'n',br:[10,50,100,250,500]},
+ pct_orient:{t:'Mulheres dirigentes que recebem orientação técnica (%) *',u:'%',br:[5,10,20,30,45]},
+ pct_coop:{t:'Mulheres dirigentes associadas a cooperativa (%) *',u:'%',br:[2,5,10,20,30]},
+ pct_trat:{t:'Mulheres dirigentes com trator (%) *',u:'%',br:[2,5,10,20,30]},
+ pct_negras:{t:'Mulheres dirigentes pretas ou pardas (%) *',u:'%',br:[20,40,60,75,90]}
+};
+const COLS=['var(--c0)','var(--c1)','var(--c2)','var(--c3)','var(--c4)','var(--c5)'];
+const cls=(v,br)=>{if(v==null||isNaN(v))return -1;let i=0;while(i<br.length&&v>=br[i])i++;return i};
+
+/* ---------- carregamento ---------- */
+Promise.all([fetch('data.json').then(r=>r.json()),fetch('mun.topo.json').then(r=>r.json()),fetch('uf.topo.json').then(r=>r.json())]).then(([d,t,u])=>{
+  D=d; TOPO=t; UFTOPO=u;
+  const C=d.mun_cols; MUN=d.mun.map(a=>Object.fromEntries(C.map((c,i)=>[c,a[i]])));
+  MUN.forEach(m=>{m.pct_est=(m.censo_cafe||0)>=10&&m.proxy_m!=null?100*m.proxy_m/m.censo_cafe:null;byCod.set(m.cod,m)});
+  Object.entries(d.geo).forEach(([k,g])=>{if(g.sigla)UFCOD[g.sigla]=k});
+  if(!byCod.has(+ST.muni))ST.muni=3169406;
+  route();
+}).catch(e=>{app.innerHTML='<div class="loading">Não foi possível carregar os dados do Atlas. Recarregue a página.</div>'});
+window.addEventListener('hashchange',route);
+
+function route(){
+  if(!D)return;
+  const r=(location.hash||'#inicio').slice(1)||'inicio';
+  const views={inicio:vHome,panorama:vPanorama,mapa:vMapa,municipios:vMuniHome,municipio:vMuni,organizacoes:vOrgs,organizacao:vOrg,historias:vHist,sobre:vSobre};
+  const fn=views[r]||vHome;
+  document.querySelectorAll('.nav a').forEach(a=>{const on=a.dataset.r===r||(r==='organizacao'&&a.dataset.r==='organizacoes')||(r==='municipio'&&a.dataset.r==='municipios')||(r==='panorama'&&a.dataset.r==='panorama');a.toggleAttribute('aria-current',on);if(on)a.setAttribute('aria-current','page')});
+  app.innerHTML=''; fn(); window.scrollTo(0,0);
+}
+function rail(cur){
+  const it=[['panorama','Indicadores',IC.chart],['mapa','Mapas',IC.map],['municipios','Municípios',IC.pin],['organizacoes','Organizações',IC.people],['historias','Histórias',IC.leaf]];
+  return `<nav class="rail" aria-label="Módulos">${it.map(([h,l,i])=>`<a href="#${h}" ${cur===h||(cur==='municipio'&&h==='municipios')?'aria-current="page"':''}>${i}${l}</a>`).join('')}<span>${IC.cal}Séries históricas <small>em breve</small></span></nav>`;
+}
+function shell(cur,html){app.innerHTML=`<div class="wrap view"><div class="shell">${rail(cur)}<div style="min-width:0">${html}</div></div></div>`}
+function kpi(ic,val,lab,g){return `<div class="kpi"><div class="ic ${g?'g':''}">${ic}</div><div><b>${val}</b><span>${lab}</span></div></div>`}
+const f2=v=>v==null?'–':v.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
+/* indicadores-síntese: o = {env:{t,m,h}, ipa, ipa_comp:{orient_tec,coop,tratores}, raz_area, prio, orgs_mil, escopo} */
+function sintCards(o){
+  const e=o.env||{}, ipa=o.ipa, c=o.ipa_comp||{};
+  const pp=v=>v==null?'–':Math.round(100*v)+'%';
+  return `<div class="sint">
+   <div><span class="lbl">Índice de envelhecimento</span><b class="big">${e.m==null?'–':f1(e.m)}</b>${e.m==null?'<p><i>Sem dado: menos de 3 mulheres jovens dirigentes.</i></p>':''}
+     <p>mulheres com 65 anos ou mais para cada mulher com menos de 25 que dirige lavoura permanente</p>
+     <div class="cmp">Todos os dirigentes: ${e.t==null?'–':f1(e.t)} · homens: ${e.h==null?'–':f1(e.h)}</div></div>
+   <div><span class="lbl">Participação ampliada na direção</span><b class="big">${o.ampl==null?'–':pc(o.ampl)}</b>
+     <div class="gauge"><i style="width:${o.lp_m||0}%;background:var(--wine)"></i><i style="left:${o.lp_m||0}%;width:${Math.max(0,(o.ampl||0)-(o.lp_m||0))}%;background:var(--gold)"></i></div>
+     <p>dos estabelecimentos de lavoura permanente têm uma mulher na direção: ${o.lp_m==null?'–':pc(o.lp_m)} como dirigente principal e mais ${o.ampl==null||o.lp_m==null?'–':pc(o.ampl-o.lp_m)} em codireção com o cônjuge</p>
+     <div class="cmp">Índice de codireção: ${o.codir==null?'–':pc(o.codir)} dos estabelecimentos são dirigidos pelo casal</div></div>
+   <div><span class="lbl">Índice de paridade no acesso</span><b class="big">${f2(ipa)}</b>
+     <div class="gauge" title="1 = paridade"><i style="width:${Math.min(100,100*(ipa||0))}%"></i></div>
+     <p>${ipa==null?'Sem dados suficientes.':`As mulheres dirigentes têm ${pp(ipa)} do acesso dos homens (1 = paridade)`}</p>
+     <div class="cmp">${o.ipa_comp?`Orientação técnica ${pp(c.orient_tec)} · cooperativa ${pp(c.coop)} · trator ${pp(c.tratores)}`:'Média de orientação técnica, cooperativa e trator, todas as atividades'}</div></div>
+   <div><span class="lbl">Razão de escala</span><b class="big">${o.raz_area==null?'–':pp(o.raz_area)}</b>${o.raz_area==null?'<p><i>Sem dado: área sob sigilo do IBGE ou poucos estabelecimentos.</i></p>':''}
+     <p>área média dos estabelecimentos dirigidos por mulheres em relação à dos dirigidos por homens</p>
+     <div class="cmp">Área total do estabelecimento, não só a lavoura de café. Estabelecimentos com café como atividade principal (SIDRA 6883)</div></div>
+   <div><span class="lbl">Lacuna organizativa</span><b class="big">${o.prio!=null?n0(o.prio):(o.orgs_mil==null?'–':f1(o.orgs_mil))}</b>
+     <p>${o.prio!=null?'municípios prioritários: 100 ou mais mulheres dirigentes estimadas e nenhuma organização mapeada':'organizações de mulheres mapeadas por mil mulheres dirigentes'}</p>
+     <div class="cmp">${o.prio!=null?`${o.orgs_mil==null?'–':f1(o.orgs_mil)} organizações por mil mulheres dirigentes`:(o.prioFlag?'<b style="color:var(--wine)">Território prioritário</b> para articulação':'')}</div></div>
+  </div>`}
+
+/* ---------- início ---------- */
+function vHome(){
+  const br=D.geo.BR1;
+  app.innerHTML=`<div class="view">
+  <section class="hero">
+    <img class="hero-photo" src="hero.jpg" srcset="hero-sm.jpg 768w, hero.jpg 1536w" sizes="(max-width:820px) 100vw, 64vw" alt="Agricultora sorrindo entre pés de café carregados de frutos maduros, com morros cultivados ao fundo">
+    <svg class="hero-wave hw-d" viewBox="0 0 600 600" preserveAspectRatio="none" aria-hidden="true"><path d="M0 0H560C470 90 610 200 520 300C430 400 600 470 500 600H0Z"/></svg>
+    <svg class="hero-wave hw-m" viewBox="0 0 600 70" preserveAspectRatio="none" aria-hidden="true"><path d="M0 40C120 0 230 10 330 34C430 58 520 50 600 18V70H0Z"/></svg>
+    <div class="hero-in"><div><h1>Mulheres que cultivam o café e transformam territórios</h1>
+    <p>Dados, mapas e histórias sobre a participação e a organização das mulheres na cafeicultura brasileira.</p>
+    <a class="cta" href="#panorama">Explorar o Atlas <span aria-hidden="true">→</span></a></div></div>
+  </section>
+  <nav class="mods" aria-label="Módulos do Atlas">
+    <a href="#panorama">${IC.chart}<div><b>Indicadores</b><span>nacionais e regionais</span></div></a>
+    <a href="#mapa">${IC.map}<div><b>Mapas</b><span>interativos</span></div></a>
+    <a href="#municipios">${IC.pin}<div><b>Municípios</b><span>diagnóstico de cada município</span></div></a>
+    <a href="#organizacoes">${IC.people}<div><b>Organizações</b><span>de mulheres</span></div></a>
+    <a href="#historias">${IC.leaf}<div><b>Histórias</b><span>e boas práticas (em construção)</span></div></a>
+  </nav>
+  <section class="home-sec"><div class="big-nums">
+    <div><b class="num">${n0(br.c50_arab+br.c50_cane)}</b><span>estabelecimentos com café no Brasil: ${n0(br.c50_arab)} com arábica e ${n0(br.c50_cane)} com canéfora</span></div>
+    <div><b class="num">${n0(br.u.est[2])}</b><span>mulheres na direção de estabelecimentos com café (estimativa), ao lado de ${n0(br.u.est[1])} homens</span></div>
+    <div><b class="num">${pc(100*br.u.est[2]/br.u.est[0])}</b><span>de participação feminina estimada na direção dos estabelecimentos com café</span></div>
+    <div><b class="num">${D.orgs.filter(o=>o.escopo==='Brasil').length}</b><span>iniciativas coletivas de mulheres mapeadas no Brasil</span></div>
+  </div><p class="note">Censo Agropecuário 2017 (IBGE, SIDRA tabelas 6955 e 6768), números trazidos do <a href="https://www.embrapa.br/web/cafe/painel-cafe-em-numeros" target="_blank" rel="noopener">painel Café em Números</a> (Embrapa Café e Embrapa Territorial). Estimativa de mulheres: em cada município, os estabelecimentos com café multiplicados pela proporção de mulheres entre quem dirige os estabelecimentos agropecuários do município, porque o IBGE não publica o café por sexo. Organizações: levantamento na web, nov/2026.</p></section></div>`;
+}
+function drawArt(c){
+  if(!c)return; const x=c.getContext('2d'),W=520,cs=getComputedStyle(document.documentElement);
+  const leaf=cs.getPropertyValue('--leaf-2').trim()||'#6E9A52', leafD=cs.getPropertyValue('--leaf').trim()||'#3F6A35', ch=cs.getPropertyValue('--cherry').trim()||'#B5333B', gold=cs.getPropertyValue('--gold').trim()||'#C9A25B';
+  x.clearRect(0,0,W,W);
+  x.fillStyle='rgba(255,255,255,.06)';x.beginPath();x.arc(290,250,230,0,7);x.fill();
+  x.strokeStyle='rgba(255,255,255,.35)';x.lineWidth=5;x.lineCap='round';x.beginPath();x.moveTo(40,470);x.bezierCurveTo(180,380,300,260,500,60);x.stroke();
+  const L=(px,py,ang,len,col)=>{x.save();x.translate(px,py);x.rotate(ang);x.fillStyle=col;x.beginPath();x.moveTo(0,0);x.bezierCurveTo(len*.3,-len*.32,len*.75,-len*.3,len,0);x.bezierCurveTo(len*.75,len*.3,len*.3,len*.32,0,0);x.fill();x.strokeStyle='rgba(255,255,255,.35)';x.lineWidth=1.5;x.beginPath();x.moveTo(4,0);x.lineTo(len*.92,0);x.stroke();x.restore()};
+  const pts=[[110,420],[190,355],[265,290],[340,215],[420,135]];
+  pts.forEach(([px,py],i)=>{L(px,py,-2.2+i*.05,150-i*10,i%2?leafD:leaf);L(px,py,.55-i*.05,140-i*12,i%2?leaf:leafD)});
+  const B=(px,py,r,col)=>{x.fillStyle=col;x.beginPath();x.ellipse(px,py,r,r*1.12,0,0,7);x.fill();x.fillStyle='rgba(255,255,255,.28)';x.beginPath();x.ellipse(px-r*.35,py-r*.4,r*.28,r*.2,-.6,0,7);x.fill()};
+  [[200,368,ch],[222,380,ch],[212,392,gold],[276,300,ch],[296,310,ch],[285,322,ch],[350,228,gold],[370,236,ch],[358,248,ch],[432,150,ch],[450,158,gold]].forEach(([a,b,cc])=>B(a,b,15,cc));
+}
+
+/* ---------- panorama ---------- */
+function geoOpts(){
+  const g=D.geo, regs=Object.entries(g).filter(([k,v])=>v.nivel==='Grande Região'), ufs=Object.entries(g).filter(([k,v])=>v.sigla&&v.estab_t>=50).sort((a,b)=>b[1].estab_t-a[1].estab_t);
+  return `<option value="BR1">Brasil</option><optgroup label="Regiões">${regs.map(([k,v])=>`<option value="${k}">${v.nome}</option>`).join('')}</optgroup><optgroup label="Estados com café">${ufs.map(([k,v])=>`<option value="${k}">${v.nome}</option>`).join('')}</optgroup>`;
+}
+function vPanorama(){
+  const g=D.geo[ST.geo]||D.geo.BR1; ST.geo=D.geo[ST.geo]?ST.geo:'BR1';
+  const regs=Object.values(D.geo).filter(v=>v.nivel==='Grande Região').map(v=>[v.nome,v.u.est]).sort((a,b)=>b[1][2]/b[1][0]-a[1][2]/a[1][0]);
+  const ufs=Object.values(D.geo).filter(v=>v.sigla&&(v.c50_arab||0)+(v.c50_cane||0)>=1000).map(v=>[v.nome,v.u.est]).sort((a,b)=>b[1][2]/b[1][0]-a[1][2]/a[1][0]);
+  const A=g.u.acesso;
+  const ES=D.esp, BRE=ES.br, ga=ES.grupos['Arábica'], gc=ES.grupos['Canéfora'];
+  const EE=D.geo.BR1.u.est_esp;
+  const espCard=(nome,cls,nEst,prod,g)=>{const em=g===ga?EE[0]:EE[1];const A=g.acesso;return `<div class="card espc ${cls}"><h2>${nome}</h2>
+     <div class="big num">${n0(nEst)}</div><div class="sub">estabelecimentos com ${nome.toLowerCase().split(' ')[0]} no Brasil (Censo 2017)</div>
+     <div class="mini"><div><b>${fmt.format(Math.round(prod/1000))} mil t</b><span>produção PAM ${BRE.pam_ano}</span></div><div><b>${g.n_mun}</b><span>municípios onde predomina</span></div><div><b>${n0(em)}</b><span>mulheres na direção (estimativa, ${pc(100*em/nEst)})</span></div></div>
+     <div class="key"><span><i style="background:var(--wine-2)"></i>Mulheres dirigentes</span><span><i style="background:#B9AEA6"></i>Homens</span></div>
+     ${[['Recebem orientação técnica',A.orient_tec],['Associadas a cooperativa',A.coop],['Têm trator',A.tratores]].map(([l,[m,h]])=>`<div class="pair"><span>${l}</span><div class="r m"><div class="t"><i style="width:${100*m/35}%"></i></div><b>${pc(m)}</b></div><div class="r h"><div class="t"><i style="width:${100*h/35}%"></i></div><b>${pc(h)}</b></div></div>`).join('')}
+     <p class="note">${pc(g.negras_m)} das mulheres dirigentes desses municípios se declaram pretas ou pardas. ${g.orgs} organizações de mulheres mapeadas com sede neles.</p></div>`};
+  shell('panorama',`<div class="page-h"><div><h1>Panorama da participação feminina na cafeicultura</h1><p>Arábica e canéfora têm territórios, escalas e perfis de produtoras diferentes. Comece pela espécie e desça até o estado.</p></div>
+   <div class="filters"><span class="tag o">Censo Agropecuário 2017</span><span class="tag o">PAM ${BRE.pam_ano}</span></div></div>
+  <div class="esp2">${espCard('Arábica','arab',BRE.estab_arabica,BRE.pam_arabica_t,ga)}${espCard('Canéfora (conilon e robusta)','cane',BRE.estab_canefora,BRE.pam_canefora_t,gc)}</div>
+  <p class="note">Espécie predominante do município: 80% ou mais da produção (PAM) de uma espécie; sem produção na PAM, vale o número de estabelecimentos do Censo. ${ES.grupos['Misto'].n_mun} municípios cafeeiros são mistos. "Mulheres na direção (estimativa)": estabelecimentos com a espécie em cada município × proporção de mulheres entre quem dirige no município (tabela 6768), o mesmo método do <a href="https://www.embrapa.br/web/cafe/painel-cafe-em-numeros" target="_blank" rel="noopener">painel Café em Números</a>. O IBGE não publica o café por sexo. Acesso a recursos: todas as mulheres (e homens) que dirigem estabelecimentos agropecuários nesses municípios.</p>
+
+  <div class="sec-h page-h"><div><h2>Por região e estado</h2><p>Escolha um recorte para ver quantos estabelecimentos têm café e quantas mulheres estão na direção.</p></div>
+   <div class="filters"><label class="lbl" for="pgeo" hidden>Recorte</label><select id="pgeo" class="sel">${geoOpts()}</select></div></div>
+  <div class="kpis">
+   ${kpi(IC.people,n0((g.c50_arab||0)+(g.c50_cane||0)),`estabelecimentos com café: ${n0(g.c50_arab)} com arábica e ${n0(g.c50_cane)} com canéfora; ${pc(100*g.u.fam[0]/g.u.fam[1])} da agricultura familiar`,1)}
+   ${kpi(IC.woman,n0(g.u.est[2]),`mulheres e ${n0(g.u.est[1])} homens na direção de estabelecimentos com café (estimativa)`)}
+   ${kpi(IC.pct,pc(100*g.u.est[2]/g.u.est[0]),'participação feminina estimada na direção dos estabelecimentos com café')}
+   ${kpi(IC.sprout,n0(g.estab_m)+' de '+n0(g.estab_t),'mulheres entre os que têm o café como atividade principal (dado observado)',1)}
+  </div>
+  <h3 class="lbl" style="margin:4px 0 10px">Indicadores-síntese · municípios cafeeiros de ${esc(g.nome)}</h3>
+  ${sintCards({...g.sint,orgs_mil:g.orgs_mil})}
+  <div class="grid g2">
+   <div class="card"><h2>Perfil de quem dirige: mulheres e homens</h2><p class="note" style="margin:-6px 0 10px">Distribuição em % de quem dirige estabelecimentos agropecuários nos municípios com café. O IBGE não publica idade, escolaridade ou raça só para o café.</p>
+     <div class="key"><span><i style="background:var(--wine-2)"></i>Mulheres</span><span><i style="background:#B9AEA6"></i>Homens</span></div>
+     <div class="tabs" role="group" aria-label="Dimensão do perfil">${[['idade','Idade'],['escolaridade','Escolaridade'],['raca','Raça/cor']].map(([k,l])=>`<button data-t="${k}" aria-pressed="${ST.ptab===k}">${l}</button>`).join('')}</div>
+     <div id="donut"></div>
+     <p class="note" id="dnote"></p></div>
+   <div class="card"><h2>Quem dirige os estabelecimentos com café, por região</h2><p class="note" style="margin:-6px 0 10px">Estimativa: estabelecimentos com café (tabela 6955) × proporção de mulheres e homens entre quem dirige em cada município (tabela 6768). Passe o mouse para ver os números.</p>
+     <div class="key"><span><i style="background:var(--wine-2)"></i>Mulheres</span><span><i style="background:#D9D0C8"></i>Homens</span></div>
+     <div class="bars">${regs.map(([n,v])=>split(n,v)).join('')}</div>
+     <h2 style="margin-top:22px">Estados com mais de mil estabelecimentos com café</h2>
+     <div class="bars">${ufs.map(([n,v])=>split(n,v)).join('')}</div></div>
+   <div class="card" style="grid-column:1/-1"><h2>Acesso a recursos: mulheres e homens que dirigem</h2>
+     <div class="key"><span><i style="background:var(--wine-2)"></i>Mulheres dirigentes</span><span><i style="background:#B9AEA6"></i>Homens dirigentes</span></div>
+     ${[['Orientação técnica','orient'],['Associação a alguma entidade','assoc'],['Cooperativa','coop'],['Possui trator','trat']].map(([l,k])=>pair(l,100*A[k][0]/A[k][1],100*A[k][2]/A[k][3],50)).join('')}
+     <p class="note">% de quem dirige estabelecimentos agropecuários (todas as atividades) nos municípios com café de ${esc(g.nome)} que tem cada recurso (Censo 2017, tabelas 6779, 6851 e 6869, sobre os estabelecimentos dirigidos pelo produtor da tabela 6776).</p></div>
+  </div>`);
+  $('#pgeo').value=ST.geo; $('#pgeo').onchange=e=>{ST.geo=e.target.value;save();vPanorama()};
+  document.querySelectorAll('.tabs button').forEach(b=>b.onclick=()=>{ST.ptab=b.dataset.t;document.querySelectorAll('.tabs button').forEach(x=>x.setAttribute('aria-pressed',x===b));donut()});
+  donut();
+}
+function bar(l,v,max,ref){const w=Math.min(100,100*v/max);return `<div class="bar"><span>${esc(l)}</span><div class="t"><i style="width:${w}%"></i>${ref!=null?`<em style="left:${Math.min(100,100*ref/max)}%" title="Homens: ${f1(ref)}%"></em>`:''}</div><span class="v">${pc(v)}</span></div>`}
+function pair(l,m,h,max){const w=v=>Math.min(100,100*(v||0)/max);return `<div class="pair"><span>${esc(l)}</span><div class="r m"><div class="t"><i style="width:${w(m)}%"></i></div><b>${m==null?'–':pc(m)}</b></div><div class="r h"><div class="t"><i style="width:${w(h)}%"></i></div><b>${h==null?'–':pc(h)}</b></div></div>`}
+function split(l,d,est=1){const pm=100*d[2]/d[0],ph=100*d[1]/d[0];return `<div class="split" title="${n0(d[2])} mulheres e ${n0(d[1])} homens${est?' (estimativa)':''}"><span>${esc(l)}</span><div class="t"><i class="m" style="width:${Math.max(pm,9)}%">${pc(pm)}</i><i class="h">${pc(ph)}</i></div></div>`}
+function donut(){
+  if(!['raca','escolaridade'].includes(ST.ptab))ST.ptab='idade';
+  const g=D.geo[ST.geo]||D.geo.BR1, u=g.u, arr=u[ST.ptab], tm=arr.reduce((s,a)=>s+a[1],0), th=arr.reduce((s,a)=>s+a[2],0);
+  const mx=Math.max(...arr.map(a=>Math.max(100*a[1]/tm,100*a[2]/th)));
+  const dn=$('#dnote'); if(dn)dn.textContent=ST.ptab==='idade'?`Pessoas que dirigem estabelecimentos agropecuários nos municípios com café de ${g.nome}, por idade (Censo 2017, tabela 6768, a mesma do painel Café em Números). Todas as atividades: é o perfil desses territórios, não só de quem produz café.`:ST.ptab==='escolaridade'?`Distribuição em % de quem dirige nos municípios com café de ${g.nome} (Censo 2017, tabela 6776). ${n0(u.nao_le[0])} mulheres e ${n0(u.nao_le[1])} homens não sabem ler e escrever. A 6776 conta só os estabelecimentos dirigidos pelo produtor, por isso a base é quase igual, mas não idêntica, à da 6768.`:`Distribuição em % de quem dirige nos municípios com café de ${g.nome}, por cor ou raça declarada (Censo 2017, tabela 6776, estabelecimentos dirigidos pelo produtor).`;
+  $('#donut').innerHTML=arr.map(a=>pair(a[0],100*a[1]/tm,100*a[2]/th,mx)).join('');
+}
+
+/* ---------- mapa ---------- */
+let mapState=null;
+function vMapa(){
+  shell('mapa',`<div class="page-h"><div><h1>Mapa do café e da participação feminina</h1><p>Clique em um município para ver os números e abrir o diagnóstico.</p></div>
+   <div class="filters"><label class="lbl" for="mind">Indicador</label><select id="mind" class="sel">${Object.entries(IND).map(([k,v])=>`<option value="${k}">${v.t}</option>`).join('')}</select>
+   <label class="lbl" for="mesp">Tipo de café</label><select id="mesp" class="sel"><option value="">Todos</option><option>Arábica</option><option>Canéfora</option><option>Misto</option></select>
+   <label class="lbl" for="mesc">Escala</label><select id="mesc" class="sel"><option value="mun">Municípios</option><option value="uf">Estados</option></select>
+   <label class="tag o" style="cursor:pointer"><input type="checkbox" id="morg"> Mostrar organizações de mulheres</label></div></div>
+  <div class="card"><div class="map-layout"><div class="mapbox" id="mapbox"><div class="zoom"><button id="zin" aria-label="Aproximar">+</button><button id="zout" aria-label="Afastar">−</button></div></div>
+   <div><div class="lbl" style="margin-bottom:8px" id="mlegt"></div><ul class="scale" id="mleg" style="list-style:none;padding:0;margin:0"></ul>
+   <p class="note" id="mnote"></p></div></div></div>`);
+  $('#mind').value=ST.ind; $('#mesc').value=ST.scale; $('#mesp').value=ST.esp||''; $('#mesp').onchange=e=>{ST.esp=e.target.value;save();paint()};
+  $('#mind').onchange=e=>{ST.ind=e.target.value;save();paint()}; $('#mesc').onchange=e=>{ST.scale=e.target.value;paint()};
+  $('#morg').onchange=paint;
+  buildMap($('#mapbox'),{onClick:showTip});
+  paint();
+}
+function buildMap(box,opt){
+  const w=box.clientWidth||800,h=box.clientHeight||560;
+  const svg=d3.select(box).append('svg').attr('viewBox',`0 0 ${w} ${h}`).attr('role','img').attr('aria-label','Mapa do Brasil por município');
+  const g=svg.append('g');
+  const mun=topojson.feature(TOPO,TOPO.objects[Object.keys(TOPO.objects)[0]]);
+  const uf=topojson.feature(UFTOPO,UFTOPO.objects[Object.keys(UFTOPO.objects)[0]]);
+  const fix=fc=>{fc.features.forEach(f=>{if(d3.geoArea(f)>2*Math.PI){const g=f.geometry;if(g.type==='Polygon')g.coordinates.forEach(r=>r.reverse());else g.coordinates.forEach(p=>p.forEach(r=>r.reverse()))}});return fc};
+  fix(mun);fix(uf);
+  const proj=d3.geoMercator().fitExtent([[10,10],[w-10,h-10]],opt.fit||uf); const path=d3.geoPath(proj);
+  const gm=g.append('g'), gu=g.append('g'), go=g.append('g');
+  const ms=gm.selectAll('path').data(mun.features).join('path').attr('d',path).attr('stroke','var(--surface)').attr('stroke-width',.15).style('cursor','pointer')
+    .on('click',(ev,d)=>{ev.stopPropagation();opt.onClick&&opt.onClick(ev,d.properties.cod)});
+  const us=gu.selectAll('path').data(uf.features).join('path').attr('d',path).attr('fill','none').attr('stroke','var(--ink-2)').attr('stroke-width',.7).attr('pointer-events','none').attr('opacity',.7);
+  const zoom=d3.zoom().scaleExtent([1,40]).on('zoom',ev=>{g.attr('transform',ev.transform);const k=ev.transform.k;ms.attr('stroke-width',.15/Math.sqrt(k));us.attr('stroke-width',.7/Math.sqrt(k));go.selectAll('circle.halo').attr('r',7/Math.pow(k,.8)).attr('stroke-width',1.6/k);go.selectAll('circle.core').attr('r',3.4/Math.pow(k,.8))});
+  svg.call(zoom); svg.on('click',()=>hideTip());
+  const zi=box.querySelector('#zin'),zo=box.querySelector('#zout');
+  if(zi){zi.onclick=()=>svg.transition().call(zoom.scaleBy,1.6);zo.onclick=()=>svg.transition().call(zoom.scaleBy,1/1.6)}
+  mapState={svg,g,ms,us,go,proj,path,zoom,w,h,box,mun,uf};
+  if(opt.focus){const f=mun.features.find(x=>x.properties.cod===opt.focus);if(f){const [[x0,y0],[x1,y1]]=path.bounds(f),cx=(x0+x1)/2,cy=(y0+y1)/2,k=Math.min(18,0.25/Math.max((x1-x0)/w,(y1-y0)/h));svg.call(zoom.transform,d3.zoomIdentity.translate(w/2-k*cx,h/2-k*cy).scale(k))}}
+  return mapState;
+}
+function paint(){
+  const M=mapState, ind=IND[ST.ind], key=ST.ind;
+  const ufAgg={};
+  if(ST.scale==='uf'){Object.values(D.geo).forEach(v=>{if(v.sigla)ufAgg[v.sigla]=v});}
+  const valMun=m=>{if(!m)return null; if(['ampl','codir','env_m','ipa'].includes(key)&&!m.esp)return null; if(key!=='estab_m'&&(m.estab_t||0)<10&&['pct_estab','pct_area'].includes(key))return null; if(['pct_orient','pct_coop','pct_trat','pct_negras'].includes(key)&&(m.estab_t||0)<10&&(m.censo_cafe||0)<50)return null; return m[key]};
+  const ufCode={11:'RO',12:'AC',13:'AM',14:'RR',15:'PA',16:'AP',17:'TO',21:'MA',22:'PI',23:'CE',24:'RN',25:'PB',26:'PE',27:'AL',28:'SE',29:'BA',31:'MG',32:'ES',33:'RJ',35:'SP',41:'PR',42:'SC',43:'RS',50:'MS',51:'MT',52:'GO',53:'DF'};
+  const valUF=cod=>{const g=D.geo['UF'+Math.floor(cod/100000)];if(!g)return null;const u=g.u,s=g.sint||{},A=u.acesso,pa=(k)=>A[k][1]?100*A[k][0]/A[k][1]:null;
+    if(key==='pct_est')return u.est[0]>=30?100*u.est[2]/u.est[0]:null;
+    if(key==='proxy_m')return u.est[0]>=30?u.est[2]:null;
+    if(['pct_orient','pct_coop','pct_trat','pct_negras'].includes(key)&&u.est[0]<30)return null;
+    if(key==='pct_orient')return pa('orient'); if(key==='pct_coop')return pa('coop'); if(key==='pct_trat')return pa('trat');
+    if(key==='pct_negras'){const r=u.raca,tm=r.reduce((a,x)=>a+x[1],0);return tm?100*(r[1][1]+r[2][1])/tm:null}
+    if(key==='ampl')return s.ampl??null; if(key==='codir')return s.codir??null; if(key==='env_m')return s.env?s.env.m:null; if(key==='ipa')return s.ipa??null;
+    const v=ufAgg[ufCode[Math.floor(cod/100000)]];if(!v||v.estab_t<30)return null;
+    if(key==='pct_estab')return 100*v.estab_m/v.estab_t; if(key==='pct_area')return v.area_m?100*v.area_m/v.area_t:null; if(key==='estab_m')return v.estab_m; return null};
+  const ufOf=c=>Math.floor(c/100000);
+  const ESPC={'Arábica':'var(--leaf)','Canéfora':'var(--gold)','Misto':'var(--wine-2)'};
+  if(key==='prio'){const P=MUN.filter(m=>m.prio);M.ms.attr('fill',d=>{const m=byCod.get(d.properties.cod);if(!m||!m.esp||(ST.esp&&m.esp!==ST.esp))return 'var(--nodata)';return m.prio?'var(--wine)':(m.n_org?'var(--leaf)':'var(--c1)')});
+    $('#mlegt').textContent='Lacuna organizativa';
+    $('#mleg').innerHTML=`<li><i style="background:var(--wine)"></i>Prioritário (${P.length})</li><li><i style="background:var(--leaf)"></i>Com organização mapeada</li><li><i style="background:var(--c1)"></i>Outros municípios cafeeiros</li><li><i style="background:var(--nodata)"></i>Município não cafeeiro</li>`;
+    $('#mnote').innerHTML='Prioritário: município cafeeiro com 100 ou mais mulheres dirigentes estimadas em estabelecimentos com café e nenhuma organização de mulheres mapeada.';
+    drawOrgs();return}
+  const lite=c=>`color-mix(in srgb, ${c} 32%, var(--surface))`;
+  if(key==='esp'&&ST.scale==='uf'){const P={};MUN.forEach(m=>{const k=ufOf(m.cod);P[k]=P[k]||[0,0];P[k][0]+=m.pam_arab||0;P[k][1]+=m.pam_cane||0});
+    const eu=k=>{const p=P[k];if(!p||p[0]+p[1]<100)return null;const s=p[0]/(p[0]+p[1]);return s>=.8?'Arábica':s<=.2?'Canéfora':'Misto'};
+    M.ms.attr('fill',d=>{const e=eu(ufOf(d.properties.cod));return e&&(!ST.esp||e===ST.esp)?ESPC[e]:'var(--nodata)'});
+    $('#mlegt').textContent='Espécie predominante no estado';
+    $('#mleg').innerHTML=Object.entries(ESPC).map(([k,c])=>`<li><i style="background:${c}"></i>${k}</li>`).join('')+`<li><i style="background:var(--nodata)"></i>Menos de 100 t de café</li>`;
+    $('#mnote').innerHTML='Espécie com 80% ou mais da produção de café do estado (PAM).';
+    drawOrgs();return}
+  if(key==='prio'&&ST.scale==='uf'){const C={};MUN.forEach(m=>{if(m.prio){const k=ufOf(m.cod);C[k]=(C[k]||0)+1}});const br=[1,3,6,10,20];
+    M.ms.attr('fill',d=>{const v=C[ufOf(d.properties.cod)];const i=cls(v||null,br);return i<0?'var(--nodata)':COLS[i]});
+    $('#mlegt').textContent='Municípios prioritários por estado';
+    $('#mleg').innerHTML=br.map((b,i)=>`<li><i style="background:${COLS[i+1]}"></i>${b}${br[i+1]?' a '+(br[i+1]-1):' ou mais'}</li>`).join('')+`<li><i style="background:var(--nodata)"></i>Nenhum</li>`;
+    $('#mnote').innerHTML='Número de municípios cafeeiros com 100 ou mais mulheres dirigentes estimadas e nenhuma organização de mulheres mapeada.';
+    drawOrgs();return}
+  if(key==='esp'){M.ms.attr('fill',d=>{const m=byCod.get(d.properties.cod);if(!m||!m.esp2||(ST.esp&&m.esp2!==ST.esp))return 'var(--nodata)';return m.esp?ESPC[m.esp2]:lite(ESPC[m.esp2])});
+    $('#mlegt').textContent='Espécie predominante';
+    $('#mleg').innerHTML=Object.entries(ESPC).map(([k,c])=>`<li><i style="background:${c}"></i>${k}: produção relevante (${MUN.filter(m=>m.esp===k).length})</li><li><i style="background:${lite(c)}"></i>${k}: baixa produção (${MUN.filter(m=>m.esp2===k&&!m.esp).length})</li>`).join('')+`<li><i style="background:var(--nodata)"></i>Sem café</li>`;
+    $('#mnote').innerHTML='Todos os municípios com café no Censo 2017 ou com produção na PAM. Espécie predominante: 80% ou mais da produção (PAM) de uma espécie; sem produção na PAM, vale o número de estabelecimentos do Censo. Cor forte: município cafeeiro (100 t ou mais na PAM, 20 ou mais estabelecimentos com café como atividade principal, ou 50 ou mais estabelecimentos com café). Cor clara: baixa produção, ou seja, pouca quantidade produzida e poucos estabelecimentos com café no município. Não tem relação com agricultura familiar.';
+    drawOrgs();return}
+  M.ms.attr('fill',d=>{const c=d.properties.cod,mm=byCod.get(c);if(ST.esp&&ST.scale!=='uf'&&(!mm||mm.esp2!==ST.esp))return 'var(--nodata)';const v=ST.scale==='uf'?valUF(c):valMun(mm);const i=cls(v,ST.scale==='uf'&&key==='estab_m'?[100,500,1000,2000,5000]:ST.scale==='uf'&&key==='proxy_m'?[200,500,1000,3000,8000]:ind.br);return i<0?'var(--nodata)':COLS[i]});
+  const br=ST.scale==='uf'&&key==='estab_m'?[100,500,1000,2000,5000]:ST.scale==='uf'&&key==='proxy_m'?[200,500,1000,3000,8000]:ind.br;
+  $('#mlegt').textContent=ind.u==='%'?'Percentual':ind.u==='x'?'Índice':'Número';
+  const lab=(a,b)=>ind.u==='x'?`${fmt.format(a)} a menos de ${fmt.format(b)}`:ind.u==='%'?`${a} a ${b-0.1}`.replace(/\./g,','):`${fmt.format(a)} a ${fmt.format(b-1)}`;
+  const items=[[`≥ ${fmt.format(br[4])}${ind.u==='%'?'%':''}`,5],[lab(br[3],br[4]),4],[lab(br[2],br[3]),3],[lab(br[1],br[2]),2],[lab(br[0],br[1]),1],[`< ${fmt.format(br[0])}${ind.u==='%'?'%':''}`,0]];
+  $('#mleg').innerHTML=items.map(([l,i])=>`<li><i style="background:${COLS[i]}"></i>${l}</li>`).join('')+`<li><i style="background:var(--nodata)"></i>Sem informação ou pouco café</li>`;
+  const star=['pct_orient','pct_coop','pct_trat','pct_negras'].includes(key);
+  $('#mnote').innerHTML=(key==='ampl'||key==='codir')?'Estabelecimentos de lavoura permanente (grupo do café), Censo 2017, tabela 6768. Participação ampliada: dirigidos por uma mulher, mais os dirigidos pelo casal em que o homem respondeu como dirigente (a mulher é a cônjuge em codireção). Municípios com 10 ou mais estabelecimentos.':key==='env_m'?'Mulheres de 65 anos ou mais para cada mulher com menos de 25 anos que dirige lavoura permanente (grupo do café), Censo 2017, tabela 6768. Só municípios com 3 ou mais jovens.':key==='ipa'?'Média de três razões entre mulheres e homens dirigentes: orientação técnica, cooperativa e trator (todas as atividades). 1 = paridade; 0,5 = metade do acesso dos homens.':key==='pct_est'?'Estimativa: em cada município, a proporção de mulheres entre quem dirige os estabelecimentos agropecuários (tabela 6768) aplicada aos estabelecimentos com café (tabela 6955), o mesmo método do painel Café em Números. Municípios com menos de 10 estabelecimentos com café ficam sem cor.':key==='pct_estab'?'Dado observado, mas restrito aos estabelecimentos que têm o café como atividade principal (tabela 6883). Em municípios de grandes fazendas ou de canéfora, a amostra é pequena. Municípios com menos de 10 desses estabelecimentos ficam sem cor.':key==='proxy_m'?'Estimativa: estabelecimentos com café (Censo 2017, tabela 6955) × participação feminina na direção de todos os estabelecimentos do município. Melhor indicador para comparar arábica e canéfora.':(ST.scale==='uf'&&star)?'* Por estado: todas as atividades agropecuárias nos municípios com café do estado.':(star?'* Recorte de todas as atividades agropecuárias do município, porque o IBGE não cruza esse tema com café. Mostrado só em municípios cafeeiros.':'Censo Agropecuário 2017. Municípios com menos de 10 estabelecimentos de café ficam sem cor.');
+  drawOrgs();
+}
+function drawOrgs(){
+  const M=mapState; M.go.selectAll('*').remove(); const on=$('#morg')&&$('#morg').checked;
+  const lg=$('#mleg'); if(lg)lg.querySelectorAll('.orgleg').forEach(x=>x.remove());
+  if(!on)return;
+  const pts=D.orgs.filter(o=>o.escopo==='Brasil'&&o.lat!=null), k=d3.zoomTransform(M.svg.node()).k||1;
+  M.go.raise();
+  M.go.selectAll('g').data(pts).join('g').attr('class','orgpt').attr('transform',o=>{const p=M.proj([o.lon,o.lat]);return `translate(${p[0]},${p[1]})`})
+    .each(function(o){const s=d3.select(this);
+      s.append('circle').attr('class','halo').attr('r',7/Math.pow(k,.8)).attr('fill','#fff').attr('opacity',.9).attr('stroke','var(--ink)').attr('stroke-width',1.6/k);
+      s.append('circle').attr('class','core').attr('r',3.4/Math.pow(k,.8)).attr('fill',o.precisao_geo&&/sede|munic/i.test(o.precisao_geo)?'var(--wine)':'var(--gold)');
+      s.append('title').text(o.nome+(o.municipio?` (${o.municipio}/${o.uf})`:''))})
+    .style('cursor','pointer').on('click',(ev,o)=>{ev.stopPropagation();ST.org=o.id;location.hash='organizacao'});
+  if(lg)lg.insertAdjacentHTML('beforeend',`<li class="orgleg" style="margin-top:8px"><svg width="18" height="18" viewBox="-9 -9 18 18" aria-hidden="true"><circle r="8" fill="#fff" stroke="var(--ink)" stroke-width="1.6"/><circle r="3.8" fill="var(--wine)"/></svg>Organização de mulheres: sede no município (${pts.filter(o=>/sede|munic/i.test(o.precisao_geo||'')).length})</li><li class="orgleg"><svg width="18" height="18" viewBox="-9 -9 18 18" aria-hidden="true"><circle r="8" fill="#fff" stroke="var(--ink)" stroke-width="1.6"/><circle r="3.8" fill="var(--gold)"/></svg>Organização com atuação regional ou estadual (ponto aproximado)</li>`);
+}
+function showTip(ev,cod){
+  const m=byCod.get(cod); if(!m)return; hideTip();
+  const box=mapState.box, rb=box.getBoundingClientRect(); let x=ev.clientX-rb.left+12,y=ev.clientY-rb.top+12;
+  const t=document.createElement('div'); t.className='tip'; t.id='tip';
+  t.innerHTML=`<h3>${esc(m.nome)} (${m.uf})</h3><dl><dt>Estabelecimentos com café</dt><dd>${n0(m.censo_cafe)}</dd><dt>Mulheres na direção (estimativa)</dt><dd>${n0(m.proxy_m)}</dd><dt>Participação feminina estimada</dt><dd>${m.censo_cafe?pc(100*m.proxy_m/m.censo_cafe):'–'}</dd><dt>Observado: café como atividade principal</dt><dd>${m.estab_t?`${n0(m.estab_m)} de ${n0(m.estab_t)}`:'–'}</dd><dt>Espécie predominante</dt><dd>${m.esp2?m.esp2+(m.esp?'':' (baixa produção)'):'–'}</dd><dt>Organizações mapeadas</dt><dd>${m.n_org}</dd></dl><button type="button">Ver diagnóstico municipal →</button>`;
+  box.appendChild(t); x=Math.min(x,rb.width-t.offsetWidth-8); y=Math.min(y,rb.height-t.offsetHeight-8); t.style.left=Math.max(8,x)+'px'; t.style.top=Math.max(8,y)+'px';
+  t.querySelector('button').onclick=()=>{ST.muni=cod;save();location.hash='municipio'};
+  t.addEventListener('click',e=>e.stopPropagation());
+}
+function hideTip(){const t=$('#tip');t&&t.remove()}
+
+/* ---------- município ---------- */
+function vMuni(){
+  const m=byCod.get(+ST.muni)||byCod.get(3169406), uf=D.geo[UFCOD[m.uf]], br=D.geo.BR1;
+  const ufp=uf&&uf.estab_t?100*uf.estab_m/uf.estab_t:null, brp=100*br.estab_m/br.estab_t;
+  const orgs=D.orgs.filter(o=>o.cod_ibge===m.cod);
+  const nm=orgs.reduce((s,o)=>s+(typeof o.num_mulheres==='number'||/^\d+$/.test(o.num_mulheres)?+o.num_mulheres:0),0);
+  const A=br.u.acesso, brO=100*A.orient[0]/A.orient[1], brC=100*A.coop[0]/A.coop[1], brT=100*A.trat[0]/A.trat[1];
+  const F=[];
+  if(m.pct_estab!=null&&(m.estab_t||0)>=10){F.push(m.pct_estab>=ufp?[1,`Participação feminina na direção (${pc(m.pct_estab)}) acima da média de ${UFN[m.uf]} (${pc(ufp)}).`]:[0,`Participação feminina na direção (${pc(m.pct_estab)}) abaixo da média de ${UFN[m.uf]} (${pc(ufp)}).`])}
+  else F.push([0,'Poucos estabelecimentos têm o café como atividade principal aqui; use o total de estabelecimentos com café e a PAM como referência.']);
+  if(m.pct_orient!=null)F.push(m.pct_orient>=brO?[1,`${pc(m.pct_orient)} das mulheres dirigentes recebem orientação técnica, acima da média nacional (${pc(brO)}).`]:[0,`Só ${pc(m.pct_orient)} das mulheres dirigentes recebem orientação técnica (média nacional ${pc(brO)}).`]);
+  if(m.pct_coop!=null)F.push(m.pct_coop>=brC?[1,`${pc(m.pct_coop)} das mulheres dirigentes são cooperadas (Brasil: ${pc(brC)}).`]:[0,`Baixa presença em cooperativas: ${pc(m.pct_coop)} das mulheres dirigentes (Brasil: ${pc(brC)}).`]);
+  F.push(orgs.length?[1,`${orgs.length} organização(ões) de mulheres do café com sede no município.`]:[0,(m.estab_m||0)>=50?'Muitas mulheres no café e nenhuma organização mapeada: território prioritário para articulação.':'Nenhuma organização de mulheres mapeada com sede no município.']);
+  shell('municipio',`<div class="page-h"><div><a class="lbl" href="#municipios" style="text-decoration:none">← Todos os municípios</a><h1>Diagnóstico municipal: ${esc(m.nome)} (${m.uf})</h1><p>${m.esp2?`<span class="tag g">Predomina ${m.esp2.toLowerCase()}${m.esp?'':' (baixa produção)'}</span> `:''}<span class="tag o">Censo Agro 2017</span> <span class="tag o">PAM ${D.pam_ano}</span></p></div>
+   <div class="muni-search"><label class="lbl" for="msq">Buscar município</label><input id="msq" class="inp" placeholder="Digite o nome do município" autocomplete="off"><ul class="sugg" id="msug" hidden></ul></div></div>
+  <div class="kpis">
+   ${kpi(IC.people,n0(m.censo_cafe),`estabelecimentos com café: ${n0(m.c_arab)} com arábica e ${n0(m.c_cane)} com canéfora${m.fam!=null&&m.censo_cafe?`; ${pc(100*m.fam/m.censo_cafe)} da agricultura familiar`:''}`,1)}
+   ${kpi(IC.woman,n0(m.proxy_m),`mulheres e ${n0(m.censo_cafe&&m.proxy_m!=null?m.censo_cafe-m.proxy_m:null)} homens na direção de estabelecimentos com café (estimativa)`)}
+   ${kpi(IC.pct,m.censo_cafe&&m.proxy_m!=null?pc(100*m.proxy_m/m.censo_cafe):'–',`participação feminina estimada; no agro todo do município são ${n0(m.dir_m)} mulheres entre ${n0(m.dir_t)} dirigentes`)}
+   ${kpi(IC.sprout,n0(m.estab_m)+' de '+n0(m.estab_t),'mulheres entre os que têm o café como atividade principal (dado observado)',1)}
+  </div>
+  <h3 class="lbl" style="margin:4px 0 10px">Indicadores-síntese</h3>
+  ${sintCards({ampl:m.ampl,lp_m:m.lp_m,codir:m.codir,env:{t:m.env_t,m:m.env_m,h:m.env_h},ipa:m.ipa,raz_area:m.raz_area,orgs_mil:m.proxy_m>=20?1000*m.n_org/m.proxy_m:null,prioFlag:m.prio})}
+  <div class="grid g-5-7">
+   <div class="card"><h2>Localização</h2><div class="mapbox" id="mmap" style="height:300px;min-height:0"></div></div>
+   <div class="card"><h2>Quem dirige: mulheres e homens</h2>
+     <div class="key"><span><i style="background:var(--wine-2)"></i>Mulheres</span><span><i style="background:#D9D0C8"></i>Homens</span></div>
+     <div class="bars">${m.censo_cafe&&m.proxy_m!=null?split(m.nome,[m.censo_cafe,m.censo_cafe-m.proxy_m,m.proxy_m]):''}${uf?split(UFN[m.uf],uf.u.est):''}${split('Brasil',br.u.est)}</div>
+     <p class="note">Estabelecimentos com café, divididos pela proporção de mulheres e homens entre quem dirige no município (estimativa, Censo 2017, tabelas 6955 e 6768).</p>
+     <h2 style="margin-top:20px">Acesso a recursos: mulheres e homens</h2>
+     <div class="key"><span><i style="background:var(--wine-2)"></i>Mulheres dirigentes</span><span><i style="background:#B9AEA6"></i>Homens dirigentes</span></div>
+     ${pair('Orientação técnica',m.pct_orient,m.pct_orient_h,60)}${pair('Cooperativa',m.pct_coop,m.pct_coop_h,60)}${pair('Possui trator',m.pct_trat,m.pct_trat_h,60)}${pair('Pretas ou pardas',m.pct_negras,m.pct_negras_h,100)}
+     <p class="note">Todas as pessoas que dirigem estabelecimentos agropecuários no município (${n0(m.dirig_agro_m)} mulheres), Censo 2017.</p></div>
+   <div class="card"><h2>Organizações de mulheres no município</h2>
+     <div class="kpis" style="grid-template-columns:repeat(2,minmax(0,1fr));margin-bottom:10px">${kpi(IC.people,orgs.length,'organizações identificadas')}${kpi(IC.woman,nm?n0(nm):'–','mulheres participantes informadas')}</div>
+     ${orgs.length?orgs.map(orgRow).join(''):`<p class="note">Nenhuma organização com sede aqui no mapeamento atual. O formulário de cadastro permitirá incluir grupos locais.</p>`}</div>
+   <div class="card"><h2>Principais achados</h2><ul class="find">${F.map(([ok,t])=>`<li><span class="${ok?'ok':'warn'}">${ok?IC.check:IC.alert}</span><span>${t}</span></li>`).join('')}</ul>
+     <h2 style="margin-top:20px">Produção de café (PAM ${D.pam_ano})</h2>
+     <dl class="facts"><dt>Produção total</dt><dd class="num">${n0(m.pam_t)} t</dd><dt>Arábica</dt><dd class="num">${n0(m.pam_arab)} t</dd><dt>Canéfora (conilon/robusta)</dt><dd class="num">${n0(m.pam_cane)} t</dd><dt>Estabelecimentos com arábica (Censo)</dt><dd class="num">${n0(m.c_arab)}</dd><dt>Estabelecimentos com canéfora (Censo)</dt><dd class="num">${n0(m.c_cane)}</dd><dt>Mulheres na direção de estabelecimentos com café (estimativa)</dt><dd class="num">${n0(m.proxy_m)}</dd></dl></div>
+  </div>`);
+  bindOrgRows(); muniSearch();
+  const box=$('#mmap'); const f=mapState=null;
+  const st=buildMap(box,{focus:m.cod,onClick:(ev,c)=>{ST.muni=c;save();vMuni()}});
+  st.ms.attr('fill',d=>d.properties.cod===m.cod?'var(--wine)':(Math.floor(d.properties.cod/100000)===Math.floor(m.cod/100000)?'var(--c1)':'var(--nodata)'));
+}
+function goMuni(c){ST.muni=c;save();if(location.hash==='#municipio')vMuni();else location.hash='municipio'}
+function vMuniHome(){
+  const top=(f,n=6)=>MUN.filter(f).sort((a,b)=>(b.pam_t||0)-(a.pam_t||0)).slice(0,n);
+  const pri=MUN.filter(m=>m.prio).sort((a,b)=>(b.proxy_m||0)-(a.proxy_m||0)).slice(0,6);
+  const li=(arr,fn)=>arr.map(m=>`<li><button type="button" class="mlink" data-c="${m.cod}"><b>${esc(m.nome)} (${m.uf})</b><span>${fn(m)}</span></button></li>`).join('');
+  shell('municipios',`<div class="page-h"><div><h1>Diagnóstico municipal</h1><p>Escolha um município para ver quantos estabelecimentos têm café, a participação estimada das mulheres na direção, os indicadores-síntese, a produção e as organizações de mulheres com sede ali.</p></div></div>
+  <div class="card" style="margin-bottom:16px"><div class="muni-search" style="max-width:520px"><label class="lbl" for="msq">Buscar município</label><input id="msq" class="inp" placeholder="Digite o nome do município" autocomplete="off"><ul class="sugg" id="msug" hidden></ul></div>
+   ${ST.muni&&byCod.get(+ST.muni)?`<p class="note" style="margin-top:10px">Último visto: <button type="button" class="linkbtn mlink" data-c="${ST.muni}">${esc(byCod.get(+ST.muni).nome)} (${byCod.get(+ST.muni).uf}) →</button></p>`:''}</div>
+  <div class="grid g3m">
+   <div class="card"><h2>Maiores produtores de arábica</h2><ul class="mlist">${li(top(m=>m.esp2==='Arábica'),m=>`${n0(m.pam_t)} t · ${n0(m.censo_cafe)} estab. com café`)}</ul></div>
+   <div class="card"><h2>Maiores produtores de canéfora</h2><ul class="mlist">${li(top(m=>m.esp2==='Canéfora'),m=>`${n0(m.pam_t)} t · ${n0(m.censo_cafe)} estab. com café`)}</ul></div>
+   <div class="card"><h2>Territórios prioritários</h2><ul class="mlist">${li(pri,m=>`cerca de ${n0(m.proxy_m)} mulheres na direção · nenhuma organização mapeada`)}</ul><p class="note"><a href="#mapa" data-ind="prio" id="toprio">Ver os ${MUN.filter(m=>m.prio).length} no mapa →</a></p></div>
+  </div>`);
+  muniSearch(); document.querySelectorAll('.mlink').forEach(b=>b.onclick=()=>goMuni(+b.dataset.c));
+  const tp=$('#toprio'); if(tp)tp.onclick=()=>{ST.ind='prio';save()};
+}
+function vHist(){
+  const tipos=[[IC.woman,'Relatos','Histórias contadas pelas próprias mulheres: trajetória na cafeicultura, sucessão familiar, conquistas e desafios. Em texto, foto, áudio ou vídeo curto, sempre com autorização de uso de imagem e voz.'],
+   [IC.people,'Boas práticas','Experiências de grupos e organizações que deram certo, como comercialização conjunta, marcas próprias, cafés especiais, gestão, crédito e participação em cooperativas.'],
+   [IC.sprout,'Tecnologias e conhecimentos','Tecnologias, cultivares, práticas de manejo e cursos da Embrapa e de parceiros, ligados aos desafios que os indicadores mostram, como acesso à assistência técnica, mecanização e sucessão.']];
+  shell('historias',`<div class="page-h"><div><div class="lbl">Em construção</div><h1>Histórias e boas práticas</h1><p>O lado humano do Atlas: quem são as mulheres por trás dos números, o que as organizações têm feito e que conhecimentos podem ajudar nos territórios.</p></div></div>
+  <div class="grid g3m">${tipos.map(([i,h,p])=>`<div class="card hcard"><span class="hic">${i}</span><h2>${h}</h2><p>${p}</p></div>`).join('')}</div>
+  <div class="grid g2" style="margin-top:16px">
+   <div class="card"><h2>Como cada história entra no Atlas</h2><ul class="find">
+    <li><span class="ok">${IC.pin}</span><span><b>Ligada a um lugar</b>: cada história tem município, espécie de café e, quando houver, a organização. Assim ela aparece no mapa e no diagnóstico municipal.</span></li>
+    <li><span class="ok">${IC.book}</span><span><b>Ligada a um tema</b>, como sucessão, assistência técnica, comercialização, cafés especiais, mecanização ou organização coletiva, para conversar com os indicadores.</span></li>
+    <li><span class="ok">${IC.check}</span><span><b>Com curadoria</b>: o envio passa por validação antes de ser publicado, com consentimento registrado, conforme a LGPD.</span></li></ul></div>
+   <div class="card"><h2>Envie uma história</h2><p>Em breve, um formulário vai permitir que mulheres, organizações e equipes técnicas enviem relatos, experiências e indicações de tecnologias. Enquanto isso, esta seção mostra como o conteúdo será organizado.</p>
+    <p class="note">O mesmo formulário servirá para cadastrar novas organizações de mulheres do café.</p></div>
+  </div>`);
+}
+function muniSearch(){
+  const q=$('#msq'),s=$('#msug'); const norm=t=>t.normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase();
+  q.oninput=()=>{const v=norm(q.value.trim()); if(v.length<2){s.hidden=true;return}
+    const r=MUN.filter(m=>norm(m.nome).startsWith(v)).concat(MUN.filter(m=>!norm(m.nome).startsWith(v)&&norm(m.nome).includes(v))).slice(0,12);
+    s.innerHTML=r.map(m=>`<li><button type="button" data-c="${m.cod}">${esc(m.nome)} (${m.uf})${m.censo_cafe?` · ${n0(m.censo_cafe)} estab. com café`:''}</button></li>`).join('')||'<li class="note" style="padding:8px">Nenhum município encontrado.</li>'; s.hidden=false;
+    s.querySelectorAll('button').forEach(b=>b.onclick=()=>goMuni(+b.dataset.c))};
+  q.onblur=()=>setTimeout(()=>s.hidden=true,200);
+}
+
+/* ---------- organizações ---------- */
+function orgRow(o){return `<button class="org" data-id="${o.id}" type="button"><span class="av">${IC.people}</span><span style="min-width:0"><b>${esc(o.nome)}</b><small>${o.municipio?esc(o.municipio)+' ('+o.uf+')':(o.uf?UFN[o.uf]||o.uf:o.pais)}${o.num_mulheres&&o.num_mulheres!=='Não localizado'?' · '+n0(+o.num_mulheres)+' mulheres':''}</small></span><span class="tag ${o.tipo==='Rede'?'g':''}">${esc(o.tipo)}</span></button>`}
+function bindOrgRows(){document.querySelectorAll('.org').forEach(b=>b.onclick=()=>{ST.org=b.dataset.id;location.hash='organizacao'})}
+function vOrgs(){
+  const tipos=[...new Set(D.orgs.map(o=>o.tipo))].sort(), ufs=[...new Set(D.orgs.filter(o=>o.uf&&o.escopo==='Brasil').map(o=>o.uf))].sort();
+  shell('organizacoes',`<div class="page-h"><div><h1>Organizações de mulheres do café</h1><p>Coletivos, cooperativas, associações, núcleos, redes e programas mapeados na web. Cadastro em validação.</p></div></div>
+   <div class="filters" style="margin-bottom:14px"><div style="flex:1 1 260px;min-width:0"><label class="lbl" for="oq" hidden>Buscar</label><input id="oq" class="inp" placeholder="Buscar organização, município ou UF…" value="${esc(ST.oq)}"></div>
+   <select id="oesc" class="sel" aria-label="Abrangência"><option value="Brasil">Brasil</option><option value="Internacional">Internacional</option><option value="">Todas</option></select>
+   <select id="otipo" class="sel" aria-label="Tipo"><option value="">Tipo</option>${tipos.map(t=>`<option>${esc(t)}</option>`).join('')}</select>
+   <select id="ouf" class="sel" aria-label="UF"><option value="">UF</option>${ufs.map(u=>`<option value="${u}">${u}</option>`).join('')}</select></div>
+   <div class="org-layout"><div class="card" style="padding:12px 14px"><div class="lbl" id="ocount" style="padding:2px 6px 8px"></div><div class="org-list" id="olist"></div></div>
+   <div class="card" style="padding:12px"><div class="mapbox" id="omap" style="height:600px"><div class="zoom"><button id="zin" aria-label="Aproximar">+</button><button id="zout" aria-label="Afastar">−</button></div></div><p class="note">Pontos na sede ou no município de referência da região. Organizações nacionais e internacionais não aparecem no mapa.</p></div></div>`);
+  $('#oesc').value=ST.oesc; $('#otipo').value=ST.otipo; $('#ouf').value=ST.ouf;
+  const st=buildMap($('#omap'),{onClick:()=>{}}); st.ms.attr('fill','var(--nodata)').attr('stroke','var(--nodata)').style('cursor','default');
+  const upd=()=>{ST.oq=$('#oq').value;ST.oesc=$('#oesc').value;ST.otipo=$('#otipo').value;ST.ouf=$('#ouf').value;
+    const n=t=>(t||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase(), q=n(ST.oq);
+    const L=D.orgs.filter(o=>(!ST.oesc||o.escopo===ST.oesc)&&(!ST.otipo||o.tipo===ST.otipo)&&(!ST.ouf||o.uf===ST.ouf)&&(!q||n([o.nome,o.sigla,o.municipio,o.uf,o.pais,o.organizacao_mae].join(' ')).includes(q)));
+    $('#ocount').textContent=`${L.length} organizações encontradas`; $('#olist').innerHTML=L.map(orgRow).join('')||'<p class="note">Nenhuma organização com esses filtros. Limpe a busca ou troque o tipo.</p>'; bindOrgRows();
+    const P=L.filter(o=>o.escopo==='Brasil'&&o.lat!=null);
+    st.go.selectAll('circle').data(P).join('circle').attr('cx',o=>st.proj([o.lon,o.lat])[0]).attr('cy',o=>st.proj([o.lon,o.lat])[1]).attr('r',5).attr('fill',o=>o.tipo==='Rede'?'var(--leaf)':o.tipo==='Núcleo'?'var(--gold)':'var(--wine)').attr('stroke','var(--surface)').attr('stroke-width',1.2).style('cursor','pointer')
+      .on('click',(ev,o)=>{ev.stopPropagation();ST.org=o.id;location.hash='organizacao'}).selectAll('title').data(o=>[o]).join('title').text(o=>o.nome);
+  };
+  ['oq','oesc','otipo','ouf'].forEach(id=>$('#'+id).addEventListener(id==='oq'?'input':'change',upd)); upd();
+  // aproxima no Sudeste/Sul, onde está a maior parte
+  const [[x0,y0],[x1,y1]]=[st.proj([-55,-13]),st.proj([-38,-26])],k=Math.min(8,.95/Math.max((x1-x0)/st.w,(y1-y0)/st.h));st.svg.call(st.zoom.transform,d3.zoomIdentity.translate(st.w/2-k*(x0+x1)/2,st.h/2-k*(y0+y1)/2).scale(k));
+}
+function vOrg(){
+  const o=D.orgs.find(x=>x.id===ST.org)||D.orgs.find(x=>x.nome.startsWith('Cafeína'));
+  const ok=v=>v!=null&&v!==''&&v!=='Não localizado';
+  const ar=(o.areas_atuacao||'').split('; ').filter(Boolean), aic={'Cafés especiais':IC.bean,'Capacitação':IC.cap,'Comercialização/exportação':IC.shop,'Marca própria':IC.award,'Concursos/premiação':IC.award,'Produção orgânica/agroecológica':IC.leaf,'Sustentabilidade':IC.sprout,'Equidade de gênero':IC.woman,'Articulação em rede':IC.people,'Barismo/torra':IC.bean,'Produção de café':IC.sprout};
+  const links=[o.site,o.instagram_redes].filter(Boolean);
+  const urls=(o.url_fonte||'').split(/;\s*/).filter(u=>u.startsWith('http'));
+  shell('organizacoes',`<section class="prof-hero"><div class="logo"><svg viewBox="0 0 48 48" width="56" height="56" aria-hidden="true"><path d="M24 44C14 36 9 27 11 17c6 2 11 7 13 15 2-8 7-13 13-15 2 10-3 19-13 27z" fill="var(--leaf)"/><ellipse cx="18" cy="12" rx="5.5" ry="6.5" fill="var(--cherry)"/><ellipse cx="29" cy="9" rx="5.5" ry="6.5" fill="var(--wine)"/></svg></div>
+   <div style="min-width:0"><div class="crumb"><a href="#organizacoes">Organizações</a> › ${esc(o.sigla||o.nome)}</div><h1>${esc(o.nome)}</h1>
+   <div class="meta"><span>📍 ${esc(o.municipio?o.municipio+' ('+o.uf+')':(o.uf?UFN[o.uf]||o.uf:o.pais))}</span><span>${esc(o.tipo)}</span>${ok(o.ano_fundacao)?`<span>Desde ${o.ano_fundacao}</span>`:''}${ok(o.num_mulheres)?`<span>${n0(+o.num_mulheres)} mulheres</span>`:''}</div></div></section>
+  <div class="grid g-5-7" style="margin-top:16px">
+   <div class="card"><h2>Sobre</h2><p style="margin:0 0 12px">${esc(o.descricao)}</p>${o.trecho?`<p class="note">Da fonte: ${esc(o.trecho)}</p>`:''}
+     ${links.length?`<p style="margin:12px 0 0;display:flex;flex-wrap:wrap;gap:12px">${links.map(u=>`<a href="${esc(u)}" target="_blank" rel="noopener">${IC.link.replace('<svg','<svg width="15" height="15" style="vertical-align:-2px"')} ${esc(u.replace(/^https?:\/\/(www\.)?/,'').replace(/\/$/,''))}</a>`).join('')}</p>`:''}</div>
+   <div class="card"><h2>Principais atividades</h2><div class="acts">${ar.map(a=>`<div>${aic[a]||IC.sprout}${esc(a)}</div>`).join('')}</div></div>
+   <div class="card"><h2>Território de atuação</h2><dl class="facts">
+     <dt>Abrangência</dt><dd>${esc(o.abrangencia)}</dd>${ok(o.regiao_produtora)?`<dt>Região produtora</dt><dd>${esc(o.regiao_produtora)}</dd>`:''}<dt>Cadeia</dt><dd>${esc(o.cadeia_produtiva)}</dd>${ok(o.organizacao_mae)?`<dt>Vínculo</dt><dd>${esc(o.organizacao_mae)}</dd>`:''}
+     <dt>Localização no mapa</dt><dd>${esc(o.precisao_geo)}</dd></dl>
+     ${o.cod_ibge?`<p style="margin:12px 0 0"><button class="tag" style="border:0;cursor:pointer" id="tomun">Ver diagnóstico do município →</button></p>`:''}</div>
+   <div class="card"><h2>Indicadores e verificação</h2><dl class="facts">
+     <dt>Mulheres vinculadas</dt><dd>${ok(o.num_mulheres)?n0(+o.num_mulheres):'Não localizado'}</dd><dt>Total de associados</dt><dd>${ok(o.num_associados)?n0(+o.num_associados):'Não localizado'}</dd>
+     <dt>Estrutura feminina</dt><dd>${esc(o.nucleo_feminino)}</dd><dt>Grau de verificação</dt><dd><span class="tag ${o.grau_verificacao==='Alto'?'g':'o'}">${esc(o.grau_verificacao)}</span></dd>
+     <dt>Situação</dt><dd>${esc(o.situacao_validacao)}</dd>${o.observacoes?`<dt>Observações</dt><dd>${esc(o.observacoes)}</dd>`:''}
+     <dt>Fontes</dt><dd>${urls.map((u,i)=>`<a href="${esc(u)}" target="_blank" rel="noopener">fonte ${i+1}</a>`).join(' · ')}</dd></dl></div>
+  </div>`);
+  const b=$('#tomun'); if(b)b.onclick=()=>{ST.muni=o.cod_ibge;save();location.hash='municipio'};
+}
+function vSobre(){
+  shell('',`<div class="page-h"><div><h1>Sobre o Atlas</h1><p>Uma iniciativa da Embrapa Café e da Embrapa Territorial.</p></div></div>
+  <div class="card" style="margin-bottom:16px"><h2>O que é</h2>
+   <p>O Atlas das Mulheres do Café é uma iniciativa da <b>Embrapa Café</b> e da <b>Embrapa Territorial</b>. Ele reúne, organiza e torna visíveis informações sobre a participação das mulheres na cafeicultura brasileira: onde estão, quantas dirigem estabelecimentos com café, como acessam assistência técnica, cooperativas e máquinas, e como se organizam coletivamente.</p>
+   <p>O objetivo é apoiar <b>gestoras e gestores públicos e tomadores de decisão</b>, <b>pesquisadoras e pesquisadores</b>, <b>equipes de assistência técnica e extensão rural</b>, <b>cooperativas e organizações</b> e as <b>próprias mulheres cafeicultoras</b>. O Atlas ajuda a orientar políticas, pesquisas e ações nos territórios onde elas fazem mais diferença.</p>
+   <p>O Atlas combina dados oficiais do IBGE (Censo Agropecuário 2017 e Produção Agrícola Municipal), parte dos dados do painel Café em Números e um mapeamento de organizações e iniciativas de mulheres do café. Ele está organizado em cinco módulos: Indicadores, Mapas, Municípios, Organizações e Histórias.</p></div>
+  <div class="grid g2"><div class="card"><h2>O que os números medem</h2><p>Os estabelecimentos com café (tabela 6955 do Censo Agropecuário 2017) e a estimativa de mulheres na direção por espécie foram trazidos do <a href="https://www.embrapa.br/web/cafe/painel-cafe-em-numeros" target="_blank" rel="noopener">painel Café em Números</a>, da Embrapa Café e da Embrapa Territorial. O IBGE não publica o café por sexo. Por isso, o número de mulheres é uma estimativa: em cada município, os estabelecimentos com café são multiplicados pela proporção de mulheres entre quem dirige os estabelecimentos agropecuários. O único dado observado de café por sexo é o dos estabelecimentos que têm o café como <b>atividade principal</b> (tabela 6883): 136,6 mil no país.</p>
+  <p>Orientação técnica, cooperativismo, tratores e raça/cor das dirigentes valem para todas as atividades agropecuárias do município, porque o IBGE não publica esses temas cruzados com o café. O acesso a crédito por sexo não está publicado no SIDRA.</p></div>
+  <div class="card"><h2>Organizações</h2><p>O cadastro reúne ${D.orgs.length} iniciativas (${D.orgs.filter(o=>o.escopo==='Brasil').length} no Brasil) identificadas em sites, notícias e publicações, com busca sistemática no Google (28 consultas fixas, páginas 1 a 5) e consulta a órgãos de assistência técnica, cooperativas, Embrapa e trabalhos acadêmicos, em novembro de 2026. Nenhuma foi validada diretamente com as organizações ainda. Quando a ausência de presença digital esconde um grupo, ele pode ser incluído pelo futuro formulário de cadastro.</p><p>Não publicamos contatos pessoais de lideranças.</p></div></div>`);
+}
+})();
+</script>
