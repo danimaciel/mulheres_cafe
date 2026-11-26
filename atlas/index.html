@@ -337,7 +337,7 @@ function route(){
 }
 function rail(cur){
   const it=[['panorama','Indicadores',IC.chart],['mapa','Mapas',IC.map],['municipios','Municípios',IC.pin],['organizacoes','Organizações',IC.people],['estudos','Estudos',IC.chart],['historias','Histórias',IC.leaf]];
-  return `<nav class="rail" aria-label="Módulos">${it.map(([h,l,i])=>`<a href="#${h}" ${cur===h||(cur==='municipio'&&h==='municipios')?'aria-current="page"':''}>${i}${l}</a>`).join('')}<span>${IC.cal}Séries históricas <small>em breve</small></span></nav>`;
+  return `<nav class="rail" aria-label="Módulos">${it.map(([h,l,i])=>`<a href="#${h}" ${cur===h||(cur==='municipio'&&h==='municipios')?'aria-current="page"':''}>${i}${l}</a>`).join('')}</nav>`;
 }
 function shell(cur,html){app.innerHTML=`<div class="wrap view"><div class="shell">${rail(cur)}<div style="min-width:0">${html}</div></div></div>`}
 function kpi(ic,val,lab,g){return `<div class="kpi"><div class="ic ${g?'g':''}">${ic}</div><div><b>${val}</b><span>${lab}</span></div></div>`}
@@ -422,7 +422,7 @@ function vPanorama(){
      ${[['Recebem orientação técnica',A.orient_tec],['Associadas a cooperativa',A.coop],['Têm trator',A.tratores]].map(([l,[m,h]])=>`<div class="pair"><span>${l}</span><div class="r m"><div class="t"><i style="width:${100*m/35}%"></i></div><b>${pc(m)}</b></div><div class="r h"><div class="t"><i style="width:${100*h/35}%"></i></div><b>${pc(h)}</b></div></div>`).join('')}
      <p class="note">${pc(g.negras_m)} das mulheres dirigentes desses municípios se declaram pretas ou pardas. ${g.orgs} organizações de mulheres mapeadas com sede neles.</p>
      <p class="note pam">Menção à PAM, à parte: em ${BRE.pam_ano}, a produção de ${nome.toLowerCase().split(' ')[0]} no Brasil foi de ${fmt.format(Math.round(prod/1000))} mil t. A PAM mede a produção do município e não tem dado por sexo.</p></div>`};
-  shell('panorama',`<div class="page-h"><div><h1>Panorama da participação feminina na cafeicultura</h1><p>Arábica e canéfora têm territórios, escalas e perfis de produtoras diferentes. Comece pela espécie e desça até o estado.</p></div>
+  shell('panorama',`<div class="page-h"><div><h1>Indicadores</h1><p>Panorama da participação feminina na cafeicultura. Arábica e canéfora têm territórios, escalas e perfis de produtoras diferentes. Comece pela espécie e desça até o estado.</p></div>
    <div class="filters"><span class="tag o">Censo Agropecuário 2017</span></div></div>
   <div class="esp2">${espCard('Arábica','arab',BRE.estab_arabica,BRE.pam_arabica_t,ga,BRE.censo_arabica_t)}${espCard('Canéfora (conilon e robusta)','cane',BRE.estab_canefora,BRE.pam_canefora_t,gc,BRE.censo_canefora_t)}</div>
   <p class="note">Espécie predominante do município: 80% ou mais da quantidade de café produzida no Censo 2017 (tabela 6955) de uma espécie; com sigilo do IBGE, vale o número de estabelecimentos com cada espécie. ${ES.grupos['Misto'].n_mun} municípios cafeeiros são mistos. "Mulheres na direção (estimativa)": estabelecimentos com a espécie em cada município × proporção de mulheres entre quem dirige no município (tabela 6768), o mesmo método do <a href="https://www.embrapa.br/web/cafe/painel-cafe-em-numeros" target="_blank" rel="noopener">painel Café em Números</a>. O IBGE não publica o café por sexo. Acesso a recursos: todas as mulheres (e homens) que dirigem estabelecimentos agropecuários nesses municípios.</p>
@@ -471,7 +471,7 @@ function donut(){
 /* ---------- mapa ---------- */
 let mapState=null;
 function vMapa(){
-  shell('mapa',`<div class="page-h"><div><h1>Mapa do café e da participação feminina</h1><p>Clique em um município para ver os números e abrir o diagnóstico.</p></div>
+  shell('mapa',`<div class="page-h"><div><h1>Mapas</h1><p>Mapa do café e da participação feminina. Clique em um município para ver os números e abrir o diagnóstico.</p></div>
    <div class="filters"><label class="lbl" for="mind">Indicador</label><select id="mind" class="sel">${Object.entries(IND).map(([k,v])=>`<option value="${k}">${v.t}</option>`).join('')}</select>
    <label class="lbl" for="mesp">Tipo de café</label><select id="mesp" class="sel"><option value="">Todos</option><option>Arábica</option><option>Canéfora</option><option>Misto</option></select>
    <label class="lbl" for="mesc">Escala</label><select id="mesc" class="sel"><option value="mun">Municípios</option><option value="uf">Estados</option></select>
@@ -636,7 +636,7 @@ function vMuniHome(){
   const cq=m=>(m.cq_arab||0)+(m.cq_cane||0); const top=(f,n=6)=>MUN.filter(f).sort((a,b)=>cq(b)-cq(a)).slice(0,n);
   const pri=MUN.filter(m=>m.prio).sort((a,b)=>(b.proxy_m||0)-(a.proxy_m||0)).slice(0,6);
   const li=(arr,fn)=>arr.map(m=>`<li><button type="button" class="mlink" data-c="${m.cod}"><b>${esc(m.nome)} (${m.uf})</b><span>${fn(m)}</span></button></li>`).join('');
-  shell('municipios',`<div class="page-h"><div><h1>Diagnóstico municipal</h1><p>Escolha um município para ver quantos estabelecimentos têm café, a participação estimada das mulheres na direção, os indicadores-síntese, a produção e as organizações de mulheres com sede ali.</p></div></div>
+  shell('municipios',`<div class="page-h"><div><h1>Municípios</h1><p>Diagnóstico de cada município. Escolha um município para ver quantos estabelecimentos têm café, a participação estimada das mulheres na direção, os indicadores-síntese, a produção e as organizações de mulheres com sede ali.</p></div></div>
   <div class="card" style="margin-bottom:16px"><div class="muni-search" style="max-width:520px"><label class="lbl" for="msq">Buscar município</label><input id="msq" class="inp" placeholder="Digite o nome do município" autocomplete="off"><ul class="sugg" id="msug" hidden></ul></div>
    ${ST.muni&&byCod.get(+ST.muni)?`<p class="note" style="margin-top:10px">Último visto: <button type="button" class="linkbtn mlink" data-c="${ST.muni}">${esc(byCod.get(+ST.muni).nome)} (${byCod.get(+ST.muni).uf}) →</button></p>`:''}</div>
   <div class="grid g3m">
@@ -653,7 +653,7 @@ function vEstudos(){
   const M=EST.meta, C=EST.cols, L=EST.docs.map(a=>Object.fromEntries(C.map((c,i)=>[c,a[i]])));
   const anos=[...new Set(L.map(d=>d.ano))].sort((a,b)=>b-a), subs=[...new Set(L.map(d=>d.subtipo).filter(Boolean))].sort();
   const F={q:'',ano:'',sub:'',n:30};
-  shell('estudos',`<div class="page-h"><div><h1>Estudos da Embrapa sobre café com autoras</h1><p>Publicações e projetos de cafeicultura da Embrapa em que pelo menos uma das pessoas da Embrapa identificadas na autoria, ou na liderança do projeto, é mulher.</p></div></div>
+  shell('estudos',`<div class="page-h"><div><h1>Estudos</h1><p>Estudos da Embrapa sobre café com autoras: publicações e projetos de cafeicultura da Embrapa em que pelo menos uma das pessoas da Embrapa identificadas na autoria, ou na liderança do projeto, é mulher.</p></div></div>
   <div class="kpis k3">
    ${kpi(IC.chart,n0(M.publicacoes_com_autora)+' de '+n0(M.publicacoes_identificadas),'publicações de café com autoria da Embrapa identificada têm ao menos uma autora ('+pc(100*M.publicacoes_com_autora/M.publicacoes_identificadas)+')',1)}
    ${kpi(IC.woman,n0(M.projetos_com_lider_mulher)+' de '+n0(M.projetos),'projetos de café no Redape são liderados por uma mulher')}
@@ -679,7 +679,7 @@ function vHist(){
   const tipos=[[IC.woman,'Relatos','Histórias contadas pelas próprias mulheres: trajetória na cafeicultura, sucessão familiar, conquistas e desafios. Em texto, foto, áudio ou vídeo curto, sempre com autorização de uso de imagem e voz.'],
    [IC.people,'Boas práticas','Experiências de grupos e organizações que deram certo, como comercialização conjunta, marcas próprias, cafés especiais, gestão, crédito e participação em cooperativas.'],
    [IC.sprout,'Tecnologias e conhecimentos','Tecnologias, cultivares, práticas de manejo e cursos da Embrapa e de parceiros, ligados aos desafios que os indicadores mostram, como acesso à assistência técnica, mecanização e sucessão.']];
-  shell('historias',`<div class="page-h"><div><div class="lbl">Em construção</div><h1>Histórias e boas práticas</h1><p>O lado humano do Atlas: quem são as mulheres por trás dos números, o que as organizações têm feito e que conhecimentos podem ajudar nos territórios.</p></div></div>
+  shell('historias',`<div class="page-h"><div><div class="lbl">Em construção</div><h1>Histórias</h1><p>Histórias e boas práticas. O lado humano do Atlas: quem são as mulheres por trás dos números, o que as organizações têm feito e que conhecimentos podem ajudar nos territórios.</p></div></div>
   <div class="grid g3m">${tipos.map(([i,h,p])=>`<div class="card hcard"><span class="hic">${i}</span><h2>${h}</h2><p>${p}</p></div>`).join('')}</div>
   <div class="grid g2" style="margin-top:16px">
    <div class="card"><h2>Como cada história entra no Atlas</h2><ul class="find">
@@ -704,7 +704,7 @@ function orgRow(o){return `<button class="org" data-id="${o.id}" type="button"><
 function bindOrgRows(){document.querySelectorAll('.org').forEach(b=>b.onclick=()=>{ST.org=b.dataset.id;location.hash='organizacao'})}
 function vOrgs(){
   const tipos=[...new Set(D.orgs.map(o=>o.tipo))].sort(), ufs=[...new Set(D.orgs.filter(o=>o.uf&&o.escopo==='Brasil').map(o=>o.uf))].sort();
-  shell('organizacoes',`<div class="page-h"><div><h1>Organizações de mulheres do café</h1><p>Coletivos, cooperativas, associações, núcleos, redes e programas mapeados na web. Cadastro em validação.</p></div></div>
+  shell('organizacoes',`<div class="page-h"><div><h1>Organizações</h1><p>Organizações de mulheres do café: coletivos, cooperativas, associações, núcleos, redes e programas mapeados na web. Cadastro em validação.</p></div></div>
    <div class="filters" style="margin-bottom:14px"><div style="flex:1 1 260px;min-width:0"><label class="lbl" for="oq" hidden>Buscar</label><input id="oq" class="inp" placeholder="Buscar organização, município ou UF…" value="${esc(ST.oq)}"></div>
    <select id="oesc" class="sel" aria-label="Abrangência"><option value="Brasil">Brasil</option><option value="Internacional">Internacional</option><option value="">Todas</option></select>
    <select id="otipo" class="sel" aria-label="Tipo"><option value="">Tipo</option>${tipos.map(t=>`<option>${esc(t)}</option>`).join('')}</select>
@@ -751,7 +751,7 @@ function vOrg(){
   const b=$('#tomun'); if(b)b.onclick=()=>{ST.muni=o.cod_ibge;save();location.hash='municipio'};
 }
 function vSobre(){
-  shell('',`<div class="page-h"><div><h1>Sobre o Atlas</h1><p>Uma iniciativa da Embrapa Café e da Embrapa Territorial.</p></div></div>
+  shell('',`<div class="page-h"><div><h1>Sobre</h1><p>Sobre o Atlas: uma iniciativa da Embrapa Café e da Embrapa Territorial.</p></div></div>
   <div class="card" style="margin-bottom:16px"><h2>O que é</h2>
    <p>O Atlas das Mulheres do Café é uma iniciativa da <b>Embrapa Café</b> e da <b>Embrapa Territorial</b>. Ele reúne, organiza e torna visíveis informações sobre a participação das mulheres na cafeicultura brasileira: onde estão, quantas dirigem estabelecimentos com café, como acessam assistência técnica, cooperativas e máquinas, e como se organizam coletivamente.</p>
    <p>O objetivo é apoiar <b>gestoras e gestores públicos e tomadores de decisão</b>, <b>pesquisadoras e pesquisadores</b>, <b>equipes de assistência técnica e extensão rural</b>, <b>cooperativas e organizações</b> e as <b>próprias mulheres cafeicultoras</b>. O Atlas ajuda a orientar políticas, pesquisas e ações nos territórios onde elas fazem mais diferença.</p>
