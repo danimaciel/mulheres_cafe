@@ -101,6 +101,12 @@ t6776 <- baixa_sidra("t6776_raca", "6776/n6/all/v/allxp/p/all/c830/all/c12564/11
 # quantidade e valor; último ano disponível
 pam <- baixa_sidra("pam1613", "1613/n6/all/v/216,214,215/p/last/c82/2723,31619,31620")
 
+# Censo 2017, tabela 6955: quantidade produzida de café arábica (111647) e
+# canéfora (111648) nos estabelecimentos com 50 pés ou mais. É a base da
+# classificação dos municípios cafeeiros e da espécie predominante, para que
+# a classificação use o mesmo ano e a mesma fonte dos dados por sexo.
+t6955q <- baixa_sidra("t6955_quant_cafe", "6955/n6/all/v/9506/p/all/c227/111647,111648")
+
 # -----------------------------------------------------------------------------
 # 2. Pivot para o formato largo (uma linha por município)
 # -----------------------------------------------------------------------------
@@ -157,6 +163,11 @@ b_pam <- pam |>
                       "Quantidade produzida" = "producao_t", "Valor da producao" = "valor_mil_reais")) |>
   larga("pam_", var, prod)
 
+b_c6955 <- t6955q |>
+  mutate(prod = if_else(grepl("ar.bica", `Produtos da lavoura permanente`, ignore.case = TRUE),
+                        "arabica", "canefora")) |>
+  larga("censo_producao_t_", prod)
+
 nomes <- t6883_cafe |> distinct(cod_ibge, nome_local) |>
   mutate(municipio = sub(" - [A-Z]{2}$", "", nome_local),
          uf = sub("^.* - ", "", nome_local)) |> select(-nome_local)
@@ -168,7 +179,8 @@ base <- nomes |>
   left_join(b_cafe, by = "cod_ibge") |> left_join(b_agro, by = "cod_ibge") |>
   left_join(b_orient, by = "cod_ibge") |> left_join(b_assoc, by = "cod_ibge") |>
   left_join(b_trat, by = "cod_ibge") |> left_join(b_dirig, by = "cod_ibge") |>
-  left_join(b_negras, by = "cod_ibge") |> left_join(b_escol, by = "cod_ibge") |> left_join(b_pam, by = "cod_ibge")
+  left_join(b_negras, by = "cod_ibge") |> left_join(b_escol, by = "cod_ibge") |> left_join(b_pam, by = "cod_ibge") |>
+  left_join(b_c6955, by = "cod_ibge")
 
 # coordenadas das sedes municipais (base aberta kelvins/municipios-brasileiros)
 coords <- read_csv("https://raw.githubusercontent.com/kelvins/municipios-brasileiros/main/csv/municipios.csv",
@@ -239,25 +251,31 @@ if (!is.na(CSV_PAINEL)) {
 # Universo do painel Café em Números: municípios com pelo menos 1 estabelecimento com café
 base <- base |> mutate(municipio_com_cafe = coalesce(censo_estab_com_cafe, 0) > 0)
 
-base <- base |> mutate(municipio_cafeeiro =
-  coalesce(cafe_estab_t, 0) >= 20 | coalesce(pam_producao_t_total, 0) >= 100 |
-  coalesce(censo_estab_com_cafe, 0) >= 50)
+# Classificacao so com o Censo 2017 (a PAM nao entra): municipio cafeeiro tem
+# 20+ estabelecimentos com cafe como atividade principal (6883), 50+ com cafe
+# (6955) ou 100+ t produzidas no Censo (6955)
+base <- base |> mutate(
+  censo_producao_t_total = coalesce(censo_producao_t_arabica, 0) + coalesce(censo_producao_t_canefora, 0),
+  municipio_cafeeiro = coalesce(censo_estab_com_cafe, 0) > 0 &
+    (coalesce(cafe_estab_t, 0) >= 20 | coalesce(censo_estab_com_cafe, 0) >= 50 |
+     censo_producao_t_total >= 100))
 
-# Especie predominante do municipio cafeeiro: >= 80% da producao da PAM de uma
-# especie; sem producao na PAM, usa os estabelecimentos com arabica/conilon do Censo
+# Especie predominante: >= 80% da quantidade produzida no Censo (6955) de uma
+# especie; com sigilo ou sem producao, usa os estabelecimentos com arabica/conilon
 if (!"censo_estab_com_arabica" %in% names(base)) {
   base$censo_estab_com_arabica <- NA_real_; base$censo_estab_com_conilon <- NA_real_ }
 base <- base |> mutate(
-  .sh_pam = ifelse(coalesce(pam_producao_t_total, 0) > 0, pam_producao_t_arabica / pam_producao_t_total, NA),
+  .sh_q   = ifelse(!is.na(censo_producao_t_arabica) & !is.na(censo_producao_t_canefora) &
+                   censo_producao_t_total > 0, censo_producao_t_arabica / censo_producao_t_total, NA),
   .n_cen  = censo_estab_com_arabica + censo_estab_com_conilon,
   .sh_cen = ifelse(!is.na(.n_cen) & .n_cen > 0, censo_estab_com_arabica / .n_cen, NA),
-  .sh     = coalesce(.sh_pam, .sh_cen),
+  .sh     = coalesce(.sh_q, .sh_cen),
   especie_predominante = case_when(!municipio_cafeeiro ~ NA_character_,
                                    .sh >= 0.8 ~ "Arabica", .sh <= 0.2 ~ "Canefora",
                                    !is.na(.sh) ~ "Misto", TRUE ~ NA_character_),
-  # mesma regra para todos os municípios com café (Censo) ou com produção na PAM,
-  # inclusive os de pequena produção
-  .univ = coalesce(censo_estab_com_cafe, 0) > 0 | coalesce(pam_producao_t_total, 0) > 0,
+  # mesma regra para todos os municípios com café no Censo, inclusive os de
+  # pequena produção
+  .univ = coalesce(censo_estab_com_cafe, 0) > 0,
   especie_predominante_todos = case_when(!.univ ~ NA_character_,
                                    .sh >= 0.8 ~ "Arabica", .sh <= 0.2 ~ "Canefora",
                                    !is.na(.sh) ~ "Misto", TRUE ~ NA_character_)) |>
@@ -344,12 +362,6 @@ base <- base |> mutate(
   ind_envelhecimento_total    = round(razao(lp_ido_t, lp_jov_t, 3), 1),
   ind_envelhecimento_mulheres = round(razao(lp_ido_m, lp_jov_m, 3), 1),
   ind_envelhecimento_homens   = round(razao(lp_ido_h, lp_jov_h, 3), 1),
-  # Paridade no acesso: media de (% mulheres / % homens) em orientacao tecnica,
-  # cooperativa e trator; 1 = paridade. Exige 10+ mulheres dirigentes.
-  .p_or = razao(agro_orient_tec_m / agro_dirigidos_m, agro_orient_tec_h / agro_dirigidos_h, 1e-9),
-  .p_co = razao(agro_coop_m / agro_dirigidos_m, agro_coop_h / agro_dirigidos_h, 1e-9),
-  .p_tr = razao(agro_tratores_m / agro_dirigidos_m, agro_tratores_h / agro_dirigidos_h, 1e-9),
-  ind_paridade_acesso = ifelse(coalesce(agro_dirigidos_m, 0) >= 10, round((.p_or + .p_co + .p_tr) / 3, 2), NA_real_),
   # Razao de escala: area media das mulheres / area media dos homens (6883)
   ind_razao_area_media_m_h = ifelse(coalesce(cafe_estab_m, 0) >= 5,
     round(ind_area_media_cafe_mulheres_ha / ind_area_media_cafe_homens_ha, 2), NA_real_),

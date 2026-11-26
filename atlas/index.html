@@ -258,7 +258,7 @@ dl.facts dt{color:var(--ink-2)}dl.facts dd{margin:0;min-width:0;overflow-wrap:an
   </nav>
 </div></header>
 <main id="app"><div class="loading">Carregando dados do Atlas…</div></main>
-<footer class="foot">Protótipo em construção. Dados: IBGE, Censo Agropecuário 2017 (tabelas SIDRA 6955, 6768, 6883, 6776, 6779, 6851, 6869) e Produção Agrícola Municipal; parte dos dados foi trazida do <a href="https://www.embrapa.br/web/cafe/painel-cafe-em-numeros" target="_blank" rel="noopener">painel Café em Números</a> (Embrapa Café e Embrapa Territorial); mapeamento de organizações feito na web em nov/2026. Malhas municipais simplificadas a partir do IBGE.</footer>
+<footer class="foot">Protótipo em construção. Dados: IBGE, Censo Agropecuário 2017 (tabelas SIDRA 6955, 6768, 6883, 6776, 6779, 6851, 6869), fonte de todos os números por sexo; Produção Agrícola Municipal só como menção à parte; parte dos dados foi trazida do <a href="https://www.embrapa.br/web/cafe/painel-cafe-em-numeros" target="_blank" rel="noopener">painel Café em Números</a> (Embrapa Café e Embrapa Territorial); mapeamento de organizações feito na web em nov/2026. Malhas municipais simplificadas a partir do IBGE.</footer>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/topojson/3.0.2/topojson.min.js"></script>
@@ -291,16 +291,16 @@ const IC={
 let D=null, MUN=[], byCod=new Map(), TOPO=null, UFTOPO=null;
 const ST={muni:3169406, org:null, geo:'BR1', ptab:'idade', ind:'pct_est', scale:'mun', otipo:'', ouf:'', oq:'', oesc:'Brasil', esp:''};
 try{const s=JSON.parse(localStorage.getItem('atlas-st')||'{}');Object.assign(ST,s)}catch(e){}
+if(ST.ind==='ipa')ST.ind='pct_est';
 const save=()=>{try{localStorage.setItem('atlas-st',JSON.stringify({muni:ST.muni,ind:ST.ind,geo:ST.geo}))}catch(e){}};
 const UFN={RO:'Rondônia',AC:'Acre',AM:'Amazonas',RR:'Roraima',PA:'Pará',AP:'Amapá',TO:'Tocantins',MA:'Maranhão',PI:'Piauí',CE:'Ceará',RN:'Rio Grande do Norte',PB:'Paraíba',PE:'Pernambuco',AL:'Alagoas',SE:'Sergipe',BA:'Bahia',MG:'Minas Gerais',ES:'Espírito Santo',RJ:'Rio de Janeiro',SP:'São Paulo',PR:'Paraná',SC:'Santa Catarina',RS:'Rio Grande do Sul',MS:'Mato Grosso do Sul',MT:'Mato Grosso',GO:'Goiás',DF:'Distrito Federal'};
 const UFCOD={};
 const IND={
  esp:{t:'Espécie de café predominante',u:'cat'},
- prio:{t:'Territórios prioritários (muitas mulheres, nenhuma organização)',u:'cat'},
+ prio:{t:'Municípios com 100 ou mais mulheres dirigentes estimadas e nenhuma organização mapeada',u:'cat'},
  ampl:{t:'Participação ampliada das mulheres na direção (% com dirigente mulher ou codireção)',u:'%',br:[10,15,20,30,40]},
  codir:{t:'Índice de codireção (% dirigidos pelo casal)',u:'%',br:[5,10,15,25,35]},
  env_m:{t:'Índice de envelhecimento das mulheres dirigentes',u:'x',br:[3,6,10,15,25]},
- ipa:{t:'Índice de paridade no acesso (1 = paridade)',u:'x',br:[0.3,0.45,0.6,0.75,0.9]},
  pct_est:{t:'Participação feminina estimada na direção dos estabelecimentos com café (%)',u:'%',br:[8,10,12,14,17]},
  pct_estab:{t:'Participação feminina observada: café como atividade principal (%)',u:'%',br:[5,10,15,20,30]},
  pct_area:{t:'Área de café dirigida por mulheres (%)',u:'%',br:[3,6,10,15,25]},
@@ -340,28 +340,24 @@ function rail(cur){
 function shell(cur,html){app.innerHTML=`<div class="wrap view"><div class="shell">${rail(cur)}<div style="min-width:0">${html}</div></div></div>`}
 function kpi(ic,val,lab,g){return `<div class="kpi"><div class="ic ${g?'g':''}">${ic}</div><div><b>${val}</b><span>${lab}</span></div></div>`}
 const f2=v=>v==null?'–':v.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
-/* indicadores-síntese: o = {env:{t,m,h}, ipa, ipa_comp:{orient_tec,coop,tratores}, raz_area, prio, orgs_mil, escopo} */
+/* indicadores-síntese: o = {env:{t,m,h}, ampl, lp_m, codir, raz_area, prio, orgs_mil} */
 function sintCards(o){
-  const e=o.env||{}, ipa=o.ipa, c=o.ipa_comp||{};
+  const e=o.env||{};
   const pp=v=>v==null?'–':Math.round(100*v)+'%';
   return `<div class="sint">
    <div><span class="lbl">Índice de envelhecimento</span><b class="big">${e.m==null?'–':f1(e.m)}</b>${e.m==null?'<p><i>Sem dado: menos de 3 mulheres jovens dirigentes.</i></p>':''}
      <p>mulheres com 65 anos ou mais para cada mulher com menos de 25 que dirige lavoura permanente</p>
-     <div class="cmp">Todos os dirigentes: ${e.t==null?'–':f1(e.t)} · homens: ${e.h==null?'–':f1(e.h)}</div></div>
+     <div class="cmp">Todos os dirigentes: ${e.t==null?'–':f1(e.t)} · homens: ${e.h==null?'–':f1(e.h)}. Censo 2017, tabela 6768, grupo lavoura permanente (mais largo que o café)</div></div>
    <div><span class="lbl">Participação ampliada na direção</span><b class="big">${o.ampl==null?'–':pc(o.ampl)}</b>
      <div class="gauge"><i style="width:${o.lp_m||0}%;background:var(--wine)"></i><i style="left:${o.lp_m||0}%;width:${Math.max(0,(o.ampl||0)-(o.lp_m||0))}%;background:var(--gold)"></i></div>
      <p>dos estabelecimentos de lavoura permanente têm uma mulher na direção: ${o.lp_m==null?'–':pc(o.lp_m)} como dirigente principal e mais ${o.ampl==null||o.lp_m==null?'–':pc(o.ampl-o.lp_m)} em codireção com o cônjuge</p>
-     <div class="cmp">Índice de codireção: ${o.codir==null?'–':pc(o.codir)} dos estabelecimentos são dirigidos pelo casal</div></div>
-   <div><span class="lbl">Índice de paridade no acesso</span><b class="big">${f2(ipa)}</b>
-     <div class="gauge" title="1 = paridade"><i style="width:${Math.min(100,100*(ipa||0))}%"></i></div>
-     <p>${ipa==null?'Sem dados suficientes.':`As mulheres dirigentes têm ${pp(ipa)} do acesso dos homens (1 = paridade)`}</p>
-     <div class="cmp">${o.ipa_comp?`Orientação técnica ${pp(c.orient_tec)} · cooperativa ${pp(c.coop)} · trator ${pp(c.tratores)}`:'Média de orientação técnica, cooperativa e trator, todas as atividades'}</div></div>
+     <div class="cmp">Índice de codireção: ${o.codir==null?'–':pc(o.codir)} dos estabelecimentos são dirigidos pelo casal. Censo 2017, tabela 6768, grupo lavoura permanente. O Censo não informa o sexo do cônjuge: quando o homem respondeu, considera-se que a mulher divide a direção</div></div>
    <div><span class="lbl">Razão de escala</span><b class="big">${o.raz_area==null?'–':pp(o.raz_area)}</b>${o.raz_area==null?'<p><i>Sem dado: área sob sigilo do IBGE ou poucos estabelecimentos.</i></p>':''}
      <p>área média dos estabelecimentos dirigidos por mulheres em relação à dos dirigidos por homens</p>
-     <div class="cmp">Área total do estabelecimento, não só a lavoura de café. Estabelecimentos com café como atividade principal (SIDRA 6883)</div></div>
-   <div><span class="lbl">Lacuna organizativa</span><b class="big">${o.prio!=null?n0(o.prio):(o.orgs_mil==null?'–':f1(o.orgs_mil))}</b>
-     <p>${o.prio!=null?'municípios prioritários: 100 ou mais mulheres dirigentes estimadas e nenhuma organização mapeada':'organizações de mulheres mapeadas por mil mulheres dirigentes'}</p>
-     <div class="cmp">${o.prio!=null?`${o.orgs_mil==null?'–':f1(o.orgs_mil)} organizações por mil mulheres dirigentes`:(o.prioFlag?'<b style="color:var(--wine)">Território prioritário</b> para articulação':'')}</div></div>
+     <div class="cmp">Área total do estabelecimento, não só a lavoura de café. Censo 2017, tabela 6883, estabelecimentos com café como atividade principal</div></div>
+   <div><span class="lbl">Organizações mapeadas</span><b class="big">${o.prio!=null?n0(o.prio):(o.orgs_mil==null?'–':f1(o.orgs_mil))}</b>
+     <p>${o.prio!=null?'municípios com 100 ou mais mulheres dirigentes estimadas e nenhuma organização de mulheres mapeada':'organizações de mulheres mapeadas por mil mulheres dirigentes estimadas'}</p>
+     <div class="cmp">${o.prio!=null?`${o.orgs_mil==null?'–':f1(o.orgs_mil)} organizações por mil mulheres dirigentes estimadas. `:(o.prioFlag?'100 ou mais mulheres dirigentes estimadas e nenhuma organização mapeada. ':'')}Mapeamento na web, nov/2026: não ter organização mapeada não quer dizer que não exista</div></div>
   </div>`}
 
 /* ---------- início ---------- */
@@ -385,10 +381,10 @@ function vHome(){
   </nav>
   <section class="home-sec"><div class="big-nums">
     <div><b class="num">${n0(br.c50_arab+br.c50_cane)}</b><span>estabelecimentos com café no Brasil: ${n0(br.c50_arab)} com arábica e ${n0(br.c50_cane)} com canéfora</span></div>
-    <div><b class="num">${n0(br.u.est[2])}</b><span>mulheres na direção de estabelecimentos com café (estimativa), ao lado de ${n0(br.u.est[1])} homens</span></div>
-    <div><b class="num">${pc(100*br.u.est[2]/br.u.est[0])}</b><span>de participação feminina estimada na direção dos estabelecimentos com café</span></div>
+    <div><b class="num">${pc(100*br.estab_m/br.estab_t)}</b><span>dos estabelecimentos com café como atividade principal são dirigidos por mulheres: ${n0(br.estab_m)} de ${n0(br.estab_t)} (dado observado)</span></div>
+    <div><b class="num">${n0(br.u.est[2])}</b><span>mulheres na direção de todos os estabelecimentos com café, ${pc(100*br.u.est[2]/br.u.est[0])} (estimativa)</span></div>
     <div><b class="num">${D.orgs.filter(o=>o.escopo==='Brasil').length}</b><span>iniciativas coletivas de mulheres mapeadas no Brasil</span></div>
-  </div><p class="note">Censo Agropecuário 2017 (IBGE, SIDRA tabelas 6955 e 6768), números trazidos do <a href="https://www.embrapa.br/web/cafe/painel-cafe-em-numeros" target="_blank" rel="noopener">painel Café em Números</a> (Embrapa Café e Embrapa Territorial). Estimativa de mulheres: em cada município, os estabelecimentos com café multiplicados pela proporção de mulheres entre quem dirige os estabelecimentos agropecuários do município, porque o IBGE não publica o café por sexo. Organizações: levantamento na web, nov/2026.</p></section></div>`;
+  </div><p class="note">Censo Agropecuário 2017 (IBGE, SIDRA tabelas 6955, 6883 e 6768). O dado observado vem da tabela 6883, que só classifica o estabelecimento pela atividade principal. Estabelecimentos com café e estimativa trazidos do <a href="https://www.embrapa.br/web/cafe/painel-cafe-em-numeros" target="_blank" rel="noopener">painel Café em Números</a> (Embrapa Café e Embrapa Territorial). Estimativa de mulheres: em cada município, os estabelecimentos com café multiplicados pela proporção de mulheres entre quem dirige os estabelecimentos agropecuários do município, porque o IBGE não publica o café por sexo. Organizações: levantamento na web, nov/2026.</p></section></div>`;
 }
 function drawArt(c){
   if(!c)return; const x=c.getContext('2d'),W=520,cs=getComputedStyle(document.documentElement);
@@ -415,26 +411,28 @@ function vPanorama(){
   const A=g.u.acesso;
   const ES=D.esp, BRE=ES.br, ga=ES.grupos['Arábica'], gc=ES.grupos['Canéfora'];
   const EE=D.geo.BR1.u.est_esp;
-  const espCard=(nome,cls,nEst,prod,g)=>{const em=g===ga?EE[0]:EE[1];const A=g.acesso;return `<div class="card espc ${cls}"><h2>${nome}</h2>
+  const espCard=(nome,cls,nEst,prod,g,cprod)=>{const em=g===ga?EE[0]:EE[1];const A=g.acesso;return `<div class="card espc ${cls}"><h2>${nome}</h2>
      <div class="big num">${n0(nEst)}</div><div class="sub">estabelecimentos com ${nome.toLowerCase().split(' ')[0]} no Brasil (Censo 2017)</div>
-     <div class="mini"><div><b>${fmt.format(Math.round(prod/1000))} mil t</b><span>produção PAM ${BRE.pam_ano}</span></div><div><b>${g.n_mun}</b><span>municípios onde predomina</span></div><div><b>${n0(em)}</b><span>mulheres na direção (estimativa, ${pc(100*em/nEst)})</span></div></div>
+     <div class="mini"><div><b>${fmt.format(Math.round(cprod/1000))} mil t</b><span>produzidas no Censo 2017 (tabela 6955)</span></div><div><b>${g.n_mun}</b><span>municípios onde predomina</span></div><div><b>${n0(em)}</b><span>mulheres na direção (estimativa, ${pc(100*em/nEst)})</span></div></div>
      <div class="key"><span><i style="background:var(--wine-2)"></i>Mulheres dirigentes</span><span><i style="background:#B9AEA6"></i>Homens</span></div>
+     <p class="note" style="margin:4px 0 6px">Acesso a recursos de quem dirige estabelecimentos agropecuários de todas as atividades nesses municípios (Censo 2017, tabelas 6779, 6851, 6869 e 6776)</p>
      ${[['Recebem orientação técnica',A.orient_tec],['Associadas a cooperativa',A.coop],['Têm trator',A.tratores]].map(([l,[m,h]])=>`<div class="pair"><span>${l}</span><div class="r m"><div class="t"><i style="width:${100*m/35}%"></i></div><b>${pc(m)}</b></div><div class="r h"><div class="t"><i style="width:${100*h/35}%"></i></div><b>${pc(h)}</b></div></div>`).join('')}
-     <p class="note">${pc(g.negras_m)} das mulheres dirigentes desses municípios se declaram pretas ou pardas. ${g.orgs} organizações de mulheres mapeadas com sede neles.</p></div>`};
+     <p class="note">${pc(g.negras_m)} das mulheres dirigentes desses municípios se declaram pretas ou pardas. ${g.orgs} organizações de mulheres mapeadas com sede neles.</p>
+     <p class="note pam">Menção à PAM, à parte: em ${BRE.pam_ano}, a produção de ${nome.toLowerCase().split(' ')[0]} no Brasil foi de ${fmt.format(Math.round(prod/1000))} mil t. A PAM mede a produção do município e não tem dado por sexo.</p></div>`};
   shell('panorama',`<div class="page-h"><div><h1>Panorama da participação feminina na cafeicultura</h1><p>Arábica e canéfora têm territórios, escalas e perfis de produtoras diferentes. Comece pela espécie e desça até o estado.</p></div>
-   <div class="filters"><span class="tag o">Censo Agropecuário 2017</span><span class="tag o">PAM ${BRE.pam_ano}</span></div></div>
-  <div class="esp2">${espCard('Arábica','arab',BRE.estab_arabica,BRE.pam_arabica_t,ga)}${espCard('Canéfora (conilon e robusta)','cane',BRE.estab_canefora,BRE.pam_canefora_t,gc)}</div>
-  <p class="note">Espécie predominante do município: 80% ou mais da produção (PAM) de uma espécie; sem produção na PAM, vale o número de estabelecimentos do Censo. ${ES.grupos['Misto'].n_mun} municípios cafeeiros são mistos. "Mulheres na direção (estimativa)": estabelecimentos com a espécie em cada município × proporção de mulheres entre quem dirige no município (tabela 6768), o mesmo método do <a href="https://www.embrapa.br/web/cafe/painel-cafe-em-numeros" target="_blank" rel="noopener">painel Café em Números</a>. O IBGE não publica o café por sexo. Acesso a recursos: todas as mulheres (e homens) que dirigem estabelecimentos agropecuários nesses municípios.</p>
+   <div class="filters"><span class="tag o">Censo Agropecuário 2017</span></div></div>
+  <div class="esp2">${espCard('Arábica','arab',BRE.estab_arabica,BRE.pam_arabica_t,ga,BRE.censo_arabica_t)}${espCard('Canéfora (conilon e robusta)','cane',BRE.estab_canefora,BRE.pam_canefora_t,gc,BRE.censo_canefora_t)}</div>
+  <p class="note">Espécie predominante do município: 80% ou mais da quantidade de café produzida no Censo 2017 (tabela 6955) de uma espécie; com sigilo do IBGE, vale o número de estabelecimentos com cada espécie. ${ES.grupos['Misto'].n_mun} municípios cafeeiros são mistos. "Mulheres na direção (estimativa)": estabelecimentos com a espécie em cada município × proporção de mulheres entre quem dirige no município (tabela 6768), o mesmo método do <a href="https://www.embrapa.br/web/cafe/painel-cafe-em-numeros" target="_blank" rel="noopener">painel Café em Números</a>. O IBGE não publica o café por sexo. Acesso a recursos: todas as mulheres (e homens) que dirigem estabelecimentos agropecuários nesses municípios.</p>
 
   <div class="sec-h page-h"><div><h2>Por região e estado</h2><p>Escolha um recorte para ver quantos estabelecimentos têm café e quantas mulheres estão na direção.</p></div>
    <div class="filters"><label class="lbl" for="pgeo" hidden>Recorte</label><select id="pgeo" class="sel">${geoOpts()}</select></div></div>
   <div class="kpis">
    ${kpi(IC.people,n0((g.c50_arab||0)+(g.c50_cane||0)),`estabelecimentos com café: ${n0(g.c50_arab)} com arábica e ${n0(g.c50_cane)} com canéfora; ${pc(100*g.u.fam[0]/g.u.fam[1])} da agricultura familiar`,1)}
-   ${kpi(IC.woman,n0(g.u.est[2]),`mulheres e ${n0(g.u.est[1])} homens na direção de estabelecimentos com café (estimativa)`)}
+   ${kpi(IC.sprout,n0(g.estab_m)+' de '+n0(g.estab_t),`mulheres entre os que têm o café como atividade principal (dado observado, tabela 6883${g.estab_t?', '+pc(100*g.estab_m/g.estab_t):''})`,1)}
+   ${kpi(IC.woman,n0(g.u.est[2]),`mulheres e ${n0(g.u.est[1])} homens na direção de todos os estabelecimentos com café (estimativa, tabelas 6955 e 6768)`)}
    ${kpi(IC.pct,pc(100*g.u.est[2]/g.u.est[0]),'participação feminina estimada na direção dos estabelecimentos com café')}
-   ${kpi(IC.sprout,n0(g.estab_m)+' de '+n0(g.estab_t),'mulheres entre os que têm o café como atividade principal (dado observado)',1)}
   </div>
-  <h3 class="lbl" style="margin:4px 0 10px">Indicadores-síntese · municípios cafeeiros de ${esc(g.nome)}</h3>
+  <h3 class="lbl" style="margin:4px 0 10px">Indicadores-síntese · municípios cafeeiros de ${esc(g.nome)} · Censo Agropecuário 2017</h3>
   ${sintCards({...g.sint,orgs_mil:g.orgs_mil})}
   <div class="grid g2">
    <div class="card"><h2>Perfil de quem dirige: mulheres e homens</h2><p class="note" style="margin:-6px 0 10px">Distribuição em % de quem dirige estabelecimentos agropecuários nos municípios com café. O IBGE não publica idade, escolaridade ou raça só para o café.</p>
@@ -509,7 +507,7 @@ function paint(){
   const M=mapState, ind=IND[ST.ind], key=ST.ind;
   const ufAgg={};
   if(ST.scale==='uf'){Object.values(D.geo).forEach(v=>{if(v.sigla)ufAgg[v.sigla]=v});}
-  const valMun=m=>{if(!m)return null; if(['ampl','codir','env_m','ipa'].includes(key)&&!m.esp)return null; if(key!=='estab_m'&&(m.estab_t||0)<10&&['pct_estab','pct_area'].includes(key))return null; if(['pct_orient','pct_coop','pct_trat','pct_negras'].includes(key)&&(m.estab_t||0)<10&&(m.censo_cafe||0)<50)return null; return m[key]};
+  const valMun=m=>{if(!m)return null; if(['ampl','codir','env_m'].includes(key)&&!m.esp)return null; if(key!=='estab_m'&&(m.estab_t||0)<10&&['pct_estab','pct_area'].includes(key))return null; if(['pct_orient','pct_coop','pct_trat','pct_negras'].includes(key)&&(m.estab_t||0)<10&&(m.censo_cafe||0)<50)return null; return m[key]};
   const ufCode={11:'RO',12:'AC',13:'AM',14:'RR',15:'PA',16:'AP',17:'TO',21:'MA',22:'PI',23:'CE',24:'RN',25:'PB',26:'PE',27:'AL',28:'SE',29:'BA',31:'MG',32:'ES',33:'RJ',35:'SP',41:'PR',42:'SC',43:'RS',50:'MS',51:'MT',52:'GO',53:'DF'};
   const valUF=cod=>{const g=D.geo['UF'+Math.floor(cod/100000)];if(!g)return null;const u=g.u,s=g.sint||{},A=u.acesso,pa=(k)=>A[k][1]?100*A[k][0]/A[k][1]:null;
     if(key==='pct_est')return u.est[0]>=30?100*u.est[2]/u.est[0]:null;
@@ -517,34 +515,34 @@ function paint(){
     if(['pct_orient','pct_coop','pct_trat','pct_negras'].includes(key)&&u.est[0]<30)return null;
     if(key==='pct_orient')return pa('orient'); if(key==='pct_coop')return pa('coop'); if(key==='pct_trat')return pa('trat');
     if(key==='pct_negras'){const r=u.raca,tm=r.reduce((a,x)=>a+x[1],0);return tm?100*(r[1][1]+r[2][1])/tm:null}
-    if(key==='ampl')return s.ampl??null; if(key==='codir')return s.codir??null; if(key==='env_m')return s.env?s.env.m:null; if(key==='ipa')return s.ipa??null;
+    if(key==='ampl')return s.ampl??null; if(key==='codir')return s.codir??null; if(key==='env_m')return s.env?s.env.m:null;
     const v=ufAgg[ufCode[Math.floor(cod/100000)]];if(!v||v.estab_t<30)return null;
     if(key==='pct_estab')return 100*v.estab_m/v.estab_t; if(key==='pct_area')return v.area_m?100*v.area_m/v.area_t:null; if(key==='estab_m')return v.estab_m; return null};
   const ufOf=c=>Math.floor(c/100000);
   const ESPC={'Arábica':'var(--leaf)','Canéfora':'var(--gold)','Misto':'var(--wine-2)'};
   if(key==='prio'){const P=MUN.filter(m=>m.prio);M.ms.attr('fill',d=>{const m=byCod.get(d.properties.cod);if(!m||!m.esp||(ST.esp&&m.esp!==ST.esp))return 'var(--nodata)';return m.prio?'var(--wine)':(m.n_org?'var(--leaf)':'var(--c1)')});
-    $('#mlegt').textContent='Lacuna organizativa';
-    $('#mleg').innerHTML=`<li><i style="background:var(--wine)"></i>Prioritário (${P.length})</li><li><i style="background:var(--leaf)"></i>Com organização mapeada</li><li><i style="background:var(--c1)"></i>Outros municípios cafeeiros</li><li><i style="background:var(--nodata)"></i>Município não cafeeiro</li>`;
-    $('#mnote').innerHTML='Prioritário: município cafeeiro com 100 ou mais mulheres dirigentes estimadas em estabelecimentos com café e nenhuma organização de mulheres mapeada.';
+    $('#mlegt').textContent='Organizações mapeadas';
+    $('#mleg').innerHTML=`<li><i style="background:var(--wine)"></i>100 ou mais mulheres estimadas e nenhuma organização mapeada (${P.length})</li><li><i style="background:var(--leaf)"></i>Com organização mapeada</li><li><i style="background:var(--c1)"></i>Outros municípios cafeeiros</li><li><i style="background:var(--nodata)"></i>Município não cafeeiro</li>`;
+    $('#mnote').innerHTML='Município cafeeiro com 100 ou mais mulheres dirigentes estimadas em estabelecimentos com café (Censo 2017, tabelas 6955 e 6768) e nenhuma organização de mulheres no mapeamento feito na web em nov/2026. Não ter organização mapeada não quer dizer que não exista.';
     drawOrgs();return}
   const lite=c=>`color-mix(in srgb, ${c} 32%, var(--surface))`;
-  if(key==='esp'&&ST.scale==='uf'){const P={};MUN.forEach(m=>{const k=ufOf(m.cod);P[k]=P[k]||[0,0];P[k][0]+=m.pam_arab||0;P[k][1]+=m.pam_cane||0});
+  if(key==='esp'&&ST.scale==='uf'){const P={};MUN.forEach(m=>{const k=ufOf(m.cod);P[k]=P[k]||[0,0];P[k][0]+=m.cq_arab||0;P[k][1]+=m.cq_cane||0});
     const eu=k=>{const p=P[k];if(!p||p[0]+p[1]<100)return null;const s=p[0]/(p[0]+p[1]);return s>=.8?'Arábica':s<=.2?'Canéfora':'Misto'};
     M.ms.attr('fill',d=>{const e=eu(ufOf(d.properties.cod));return e&&(!ST.esp||e===ST.esp)?ESPC[e]:'var(--nodata)'});
     $('#mlegt').textContent='Espécie predominante no estado';
-    $('#mleg').innerHTML=Object.entries(ESPC).map(([k,c])=>`<li><i style="background:${c}"></i>${k}</li>`).join('')+`<li><i style="background:var(--nodata)"></i>Menos de 100 t de café</li>`;
-    $('#mnote').innerHTML='Espécie com 80% ou mais da produção de café do estado (PAM).';
+    $('#mleg').innerHTML=Object.entries(ESPC).map(([k,c])=>`<li><i style="background:${c}"></i>${k}</li>`).join('')+`<li><i style="background:var(--nodata)"></i>Menos de 100 t de café (Censo 2017)</li>`;
+    $('#mnote').innerHTML='Espécie com 80% ou mais da quantidade de café produzida no estado segundo o Censo Agropecuário 2017 (tabela 6955, soma dos municípios sem sigilo).';
     drawOrgs();return}
   if(key==='prio'&&ST.scale==='uf'){const C={};MUN.forEach(m=>{if(m.prio){const k=ufOf(m.cod);C[k]=(C[k]||0)+1}});const br=[1,3,6,10,20];
     M.ms.attr('fill',d=>{const v=C[ufOf(d.properties.cod)];const i=cls(v||null,br);return i<0?'var(--nodata)':COLS[i]});
-    $('#mlegt').textContent='Municípios prioritários por estado';
+    $('#mlegt').textContent='Municípios sem organização mapeada, por estado';
     $('#mleg').innerHTML=br.map((b,i)=>`<li><i style="background:${COLS[i+1]}"></i>${b}${br[i+1]?' a '+(br[i+1]-1):' ou mais'}</li>`).join('')+`<li><i style="background:var(--nodata)"></i>Nenhum</li>`;
     $('#mnote').innerHTML='Número de municípios cafeeiros com 100 ou mais mulheres dirigentes estimadas e nenhuma organização de mulheres mapeada.';
     drawOrgs();return}
   if(key==='esp'){M.ms.attr('fill',d=>{const m=byCod.get(d.properties.cod);if(!m||!m.esp2||(ST.esp&&m.esp2!==ST.esp))return 'var(--nodata)';return m.esp?ESPC[m.esp2]:lite(ESPC[m.esp2])});
     $('#mlegt').textContent='Espécie predominante';
     $('#mleg').innerHTML=Object.entries(ESPC).map(([k,c])=>`<li><i style="background:${c}"></i>${k}: produção relevante (${MUN.filter(m=>m.esp===k).length})</li><li><i style="background:${lite(c)}"></i>${k}: baixa produção (${MUN.filter(m=>m.esp2===k&&!m.esp).length})</li>`).join('')+`<li><i style="background:var(--nodata)"></i>Sem café</li>`;
-    $('#mnote').innerHTML='Todos os municípios com café no Censo 2017 ou com produção na PAM. Espécie predominante: 80% ou mais da produção (PAM) de uma espécie; sem produção na PAM, vale o número de estabelecimentos do Censo. Cor forte: município cafeeiro (100 t ou mais na PAM, 20 ou mais estabelecimentos com café como atividade principal, ou 50 ou mais estabelecimentos com café). Cor clara: baixa produção, ou seja, pouca quantidade produzida e poucos estabelecimentos com café no município. Não tem relação com agricultura familiar.';
+    $('#mnote').innerHTML='Todos os municípios com café no Censo Agropecuário 2017. Espécie predominante: 80% ou mais da quantidade produzida no Censo (tabela 6955) de uma espécie; com sigilo do IBGE, vale o número de estabelecimentos com cada espécie. Cor forte: município cafeeiro (no Censo 2017, 100 t ou mais produzidas, 20 ou mais estabelecimentos com café como atividade principal, ou 50 ou mais estabelecimentos com café). Cor clara: baixa produção, ou seja, pouca quantidade produzida e poucos estabelecimentos com café no município. Não tem relação com agricultura familiar.';
     drawOrgs();return}
   M.ms.attr('fill',d=>{const c=d.properties.cod,mm=byCod.get(c);if(ST.esp&&ST.scale!=='uf'&&(!mm||mm.esp2!==ST.esp))return 'var(--nodata)';const v=ST.scale==='uf'?valUF(c):valMun(mm);const i=cls(v,ST.scale==='uf'&&key==='estab_m'?[100,500,1000,2000,5000]:ST.scale==='uf'&&key==='proxy_m'?[200,500,1000,3000,8000]:ind.br);return i<0?'var(--nodata)':COLS[i]});
   const br=ST.scale==='uf'&&key==='estab_m'?[100,500,1000,2000,5000]:ST.scale==='uf'&&key==='proxy_m'?[200,500,1000,3000,8000]:ind.br;
@@ -553,7 +551,7 @@ function paint(){
   const items=[[`≥ ${fmt.format(br[4])}${ind.u==='%'?'%':''}`,5],[lab(br[3],br[4]),4],[lab(br[2],br[3]),3],[lab(br[1],br[2]),2],[lab(br[0],br[1]),1],[`< ${fmt.format(br[0])}${ind.u==='%'?'%':''}`,0]];
   $('#mleg').innerHTML=items.map(([l,i])=>`<li><i style="background:${COLS[i]}"></i>${l}</li>`).join('')+`<li><i style="background:var(--nodata)"></i>Sem informação ou pouco café</li>`;
   const star=['pct_orient','pct_coop','pct_trat','pct_negras'].includes(key);
-  $('#mnote').innerHTML=(key==='ampl'||key==='codir')?'Estabelecimentos de lavoura permanente (grupo do café), Censo 2017, tabela 6768. Participação ampliada: dirigidos por uma mulher, mais os dirigidos pelo casal em que o homem respondeu como dirigente (a mulher é a cônjuge em codireção). Municípios com 10 ou mais estabelecimentos.':key==='env_m'?'Mulheres de 65 anos ou mais para cada mulher com menos de 25 anos que dirige lavoura permanente (grupo do café), Censo 2017, tabela 6768. Só municípios com 3 ou mais jovens.':key==='ipa'?'Média de três razões entre mulheres e homens dirigentes: orientação técnica, cooperativa e trator (todas as atividades). 1 = paridade; 0,5 = metade do acesso dos homens.':key==='pct_est'?'Estimativa: em cada município, a proporção de mulheres entre quem dirige os estabelecimentos agropecuários (tabela 6768) aplicada aos estabelecimentos com café (tabela 6955), o mesmo método do painel Café em Números. Municípios com menos de 10 estabelecimentos com café ficam sem cor.':key==='pct_estab'?'Dado observado, mas restrito aos estabelecimentos que têm o café como atividade principal (tabela 6883). Em municípios de grandes fazendas ou de canéfora, a amostra é pequena. Municípios com menos de 10 desses estabelecimentos ficam sem cor.':key==='proxy_m'?'Estimativa: estabelecimentos com café (Censo 2017, tabela 6955) × participação feminina na direção de todos os estabelecimentos do município. Melhor indicador para comparar arábica e canéfora.':(ST.scale==='uf'&&star)?'* Por estado: todas as atividades agropecuárias nos municípios com café do estado.':(star?'* Recorte de todas as atividades agropecuárias do município, porque o IBGE não cruza esse tema com café. Mostrado só em municípios cafeeiros.':'Censo Agropecuário 2017. Municípios com menos de 10 estabelecimentos de café ficam sem cor.');
+  $('#mnote').innerHTML=(key==='ampl'||key==='codir')?'Estabelecimentos de lavoura permanente (grupo do café), Censo 2017, tabela 6768. Participação ampliada: dirigidos por uma mulher, mais os dirigidos pelo casal em que o homem respondeu como dirigente (a mulher é a cônjuge em codireção). Municípios com 10 ou mais estabelecimentos.':key==='env_m'?'Mulheres de 65 anos ou mais para cada mulher com menos de 25 anos que dirige lavoura permanente (grupo do café), Censo 2017, tabela 6768. Só municípios com 3 ou mais jovens.':key==='pct_est'?'Estimativa: em cada município, a proporção de mulheres entre quem dirige os estabelecimentos agropecuários (tabela 6768) aplicada aos estabelecimentos com café (tabela 6955), o mesmo método do painel Café em Números. Municípios com menos de 10 estabelecimentos com café ficam sem cor.':key==='pct_estab'?'Dado observado, mas restrito aos estabelecimentos que têm o café como atividade principal (tabela 6883). Em municípios de grandes fazendas ou de canéfora, a amostra é pequena. Municípios com menos de 10 desses estabelecimentos ficam sem cor.':key==='proxy_m'?'Estimativa: estabelecimentos com café (Censo 2017, tabela 6955) × participação feminina na direção de todos os estabelecimentos do município. Melhor indicador para comparar arábica e canéfora.':(ST.scale==='uf'&&star)?'* Por estado: todas as atividades agropecuárias nos municípios com café do estado.':(star?'* Recorte de todas as atividades agropecuárias do município, porque o IBGE não cruza esse tema com café. Mostrado só em municípios cafeeiros.':'Censo Agropecuário 2017. Municípios com menos de 10 estabelecimentos de café ficam sem cor.');
   drawOrgs();
 }
 function drawOrgs(){
@@ -590,20 +588,20 @@ function vMuni(){
   const A=br.u.acesso, brO=100*A.orient[0]/A.orient[1], brC=100*A.coop[0]/A.coop[1], brT=100*A.trat[0]/A.trat[1];
   const F=[];
   if(m.pct_estab!=null&&(m.estab_t||0)>=10){F.push(m.pct_estab>=ufp?[1,`Participação feminina na direção (${pc(m.pct_estab)}) acima da média de ${UFN[m.uf]} (${pc(ufp)}).`]:[0,`Participação feminina na direção (${pc(m.pct_estab)}) abaixo da média de ${UFN[m.uf]} (${pc(ufp)}).`])}
-  else F.push([0,'Poucos estabelecimentos têm o café como atividade principal aqui; use o total de estabelecimentos com café e a PAM como referência.']);
-  if(m.pct_orient!=null)F.push(m.pct_orient>=brO?[1,`${pc(m.pct_orient)} das mulheres dirigentes recebem orientação técnica, acima da média nacional (${pc(brO)}).`]:[0,`Só ${pc(m.pct_orient)} das mulheres dirigentes recebem orientação técnica (média nacional ${pc(brO)}).`]);
-  if(m.pct_coop!=null)F.push(m.pct_coop>=brC?[1,`${pc(m.pct_coop)} das mulheres dirigentes são cooperadas (Brasil: ${pc(brC)}).`]:[0,`Baixa presença em cooperativas: ${pc(m.pct_coop)} das mulheres dirigentes (Brasil: ${pc(brC)}).`]);
-  F.push(orgs.length?[1,`${orgs.length} organização(ões) de mulheres do café com sede no município.`]:[0,(m.estab_m||0)>=50?'Muitas mulheres no café e nenhuma organização mapeada: território prioritário para articulação.':'Nenhuma organização de mulheres mapeada com sede no município.']);
-  shell('municipio',`<div class="page-h"><div><a class="lbl" href="#municipios" style="text-decoration:none">← Todos os municípios</a><h1>Diagnóstico municipal: ${esc(m.nome)} (${m.uf})</h1><p>${m.esp2?`<span class="tag g">Predomina ${m.esp2.toLowerCase()}${m.esp?'':' (baixa produção)'}</span> `:''}<span class="tag o">Censo Agro 2017</span> <span class="tag o">PAM ${D.pam_ano}</span></p></div>
+  else F.push([0,'Poucos estabelecimentos têm o café como atividade principal aqui; o total de estabelecimentos com café (tabela 6955) dá a dimensão do café no município.']);
+  if(m.pct_orient!=null)F.push(m.pct_orient>=brO?[1,`${pc(m.pct_orient)} das mulheres dirigentes recebem orientação técnica, acima da média nacional (${pc(brO)}).`]:[0,`${pc(m.pct_orient)} das mulheres dirigentes recebem orientação técnica, abaixo da média nacional (${pc(brO)}).`]);
+  if(m.pct_coop!=null)F.push(m.pct_coop>=brC?[1,`${pc(m.pct_coop)} das mulheres dirigentes são cooperadas (Brasil: ${pc(brC)}).`]:[0,`${pc(m.pct_coop)} das mulheres dirigentes são cooperadas (Brasil: ${pc(brC)}).`]);
+  F.push(orgs.length?[1,`${orgs.length} organização(ões) de mulheres do café com sede no município.`]:[0,(m.estab_m||0)>=50?'Nenhuma organização de mulheres mapeada com sede no município, que tem 50 ou mais estabelecimentos de café dirigidos por mulheres. O mapeamento foi feito na web e pode não incluir grupos sem presença digital.':'Nenhuma organização de mulheres mapeada com sede no município.']);
+  shell('municipio',`<div class="page-h"><div><a class="lbl" href="#municipios" style="text-decoration:none">← Todos os municípios</a><h1>Diagnóstico municipal: ${esc(m.nome)} (${m.uf})</h1><p>${m.esp2?`<span class="tag g">Predomina ${m.esp2.toLowerCase()}${m.esp?'':' (baixa produção)'}</span> `:''}<span class="tag o">Censo Agro 2017</span></p></div>
    <div class="muni-search"><label class="lbl" for="msq">Buscar município</label><input id="msq" class="inp" placeholder="Digite o nome do município" autocomplete="off"><ul class="sugg" id="msug" hidden></ul></div></div>
   <div class="kpis">
    ${kpi(IC.people,n0(m.censo_cafe),`estabelecimentos com café: ${n0(m.c_arab)} com arábica e ${n0(m.c_cane)} com canéfora${m.fam!=null&&m.censo_cafe?`; ${pc(100*m.fam/m.censo_cafe)} da agricultura familiar`:''}`,1)}
-   ${kpi(IC.woman,n0(m.proxy_m),`mulheres e ${n0(m.censo_cafe&&m.proxy_m!=null?m.censo_cafe-m.proxy_m:null)} homens na direção de estabelecimentos com café (estimativa)`)}
+   ${kpi(IC.sprout,n0(m.estab_m)+' de '+n0(m.estab_t),'mulheres entre os que têm o café como atividade principal (dado observado, tabela 6883)',1)}
+   ${kpi(IC.woman,n0(m.proxy_m),`mulheres e ${n0(m.censo_cafe&&m.proxy_m!=null?m.censo_cafe-m.proxy_m:null)} homens na direção de todos os estabelecimentos com café (estimativa)`)}
    ${kpi(IC.pct,m.censo_cafe&&m.proxy_m!=null?pc(100*m.proxy_m/m.censo_cafe):'–',`participação feminina estimada; no agro todo do município são ${n0(m.dir_m)} mulheres entre ${n0(m.dir_t)} dirigentes`)}
-   ${kpi(IC.sprout,n0(m.estab_m)+' de '+n0(m.estab_t),'mulheres entre os que têm o café como atividade principal (dado observado)',1)}
   </div>
-  <h3 class="lbl" style="margin:4px 0 10px">Indicadores-síntese</h3>
-  ${sintCards({ampl:m.ampl,lp_m:m.lp_m,codir:m.codir,env:{t:m.env_t,m:m.env_m,h:m.env_h},ipa:m.ipa,raz_area:m.raz_area,orgs_mil:m.proxy_m>=20?1000*m.n_org/m.proxy_m:null,prioFlag:m.prio})}
+  <h3 class="lbl" style="margin:4px 0 10px">Indicadores-síntese · Censo Agropecuário 2017</h3>
+  ${sintCards({ampl:m.ampl,lp_m:m.lp_m,codir:m.codir,env:{t:m.env_t,m:m.env_m,h:m.env_h},raz_area:m.raz_area,orgs_mil:m.proxy_m>=20?1000*m.n_org/m.proxy_m:null,prioFlag:m.prio})}
   <div class="grid g-5-7">
    <div class="card"><h2>Localização</h2><div class="mapbox" id="mmap" style="height:300px;min-height:0"></div></div>
    <div class="card"><h2>Quem dirige: mulheres e homens</h2>
@@ -617,9 +615,13 @@ function vMuni(){
    <div class="card"><h2>Organizações de mulheres no município</h2>
      <div class="kpis" style="grid-template-columns:repeat(2,minmax(0,1fr));margin-bottom:10px">${kpi(IC.people,orgs.length,'organizações identificadas')}${kpi(IC.woman,nm?n0(nm):'–','mulheres participantes informadas')}</div>
      ${orgs.length?orgs.map(orgRow).join(''):`<p class="note">Nenhuma organização com sede aqui no mapeamento atual. O formulário de cadastro permitirá incluir grupos locais.</p>`}</div>
-   <div class="card"><h2>Principais achados</h2><ul class="find">${F.map(([ok,t])=>`<li><span class="${ok?'ok':'warn'}">${ok?IC.check:IC.alert}</span><span>${t}</span></li>`).join('')}</ul>
-     <h2 style="margin-top:20px">Produção de café (PAM ${D.pam_ano})</h2>
-     <dl class="facts"><dt>Produção total</dt><dd class="num">${n0(m.pam_t)} t</dd><dt>Arábica</dt><dd class="num">${n0(m.pam_arab)} t</dd><dt>Canéfora (conilon/robusta)</dt><dd class="num">${n0(m.pam_cane)} t</dd><dt>Estabelecimentos com arábica (Censo)</dt><dd class="num">${n0(m.c_arab)}</dd><dt>Estabelecimentos com canéfora (Censo)</dt><dd class="num">${n0(m.c_cane)}</dd><dt>Mulheres na direção de estabelecimentos com café (estimativa)</dt><dd class="num">${n0(m.proxy_m)}</dd></dl></div>
+   <div class="card"><h2>Principais achados</h2><p class="note" style="margin:-6px 0 10px">Censo 2017. Orientação técnica e cooperativa: todas as atividades agropecuárias do município.</p><ul class="find">${F.map(([ok,t])=>`<li><span class="${ok?'ok':'warn'}">${ok?IC.check:IC.alert}</span><span>${t}</span></li>`).join('')}</ul>
+     <h2 style="margin-top:20px">Produção de café (Censo 2017)</h2>
+     <dl class="facts"><dt>Arábica</dt><dd class="num">${m.cq_arab==null?(m.c_arab?'X (sigilo)':'0 t'):n0(m.cq_arab)+' t'}</dd><dt>Canéfora (conilon/robusta)</dt><dd class="num">${m.cq_cane==null?(m.c_cane?'X (sigilo)':'0 t'):n0(m.cq_cane)+' t'}</dd></dl>
+     <p class="note">Tabela 6955, estabelecimentos com 50 pés ou mais.</p>
+     <h3 style="margin-top:16px">Menção à PAM ${D.pam_ano}</h3>
+     <p class="note" style="margin:-6px 0 10px">A PAM mede a produção do município, sem dado por sexo, e não se cruza com os números do Censo acima.</p>
+     <dl class="facts"><dt>Produção total</dt><dd class="num">${n0(m.pam_t)} t</dd><dt>Arábica</dt><dd class="num">${n0(m.pam_arab)} t</dd><dt>Canéfora (conilon/robusta)</dt><dd class="num">${n0(m.pam_cane)} t</dd></dl></div>
   </div>`);
   bindOrgRows(); muniSearch();
   const box=$('#mmap'); const f=mapState=null;
@@ -628,16 +630,16 @@ function vMuni(){
 }
 function goMuni(c){ST.muni=c;save();if(location.hash==='#municipio')vMuni();else location.hash='municipio'}
 function vMuniHome(){
-  const top=(f,n=6)=>MUN.filter(f).sort((a,b)=>(b.pam_t||0)-(a.pam_t||0)).slice(0,n);
+  const cq=m=>(m.cq_arab||0)+(m.cq_cane||0); const top=(f,n=6)=>MUN.filter(f).sort((a,b)=>cq(b)-cq(a)).slice(0,n);
   const pri=MUN.filter(m=>m.prio).sort((a,b)=>(b.proxy_m||0)-(a.proxy_m||0)).slice(0,6);
   const li=(arr,fn)=>arr.map(m=>`<li><button type="button" class="mlink" data-c="${m.cod}"><b>${esc(m.nome)} (${m.uf})</b><span>${fn(m)}</span></button></li>`).join('');
   shell('municipios',`<div class="page-h"><div><h1>Diagnóstico municipal</h1><p>Escolha um município para ver quantos estabelecimentos têm café, a participação estimada das mulheres na direção, os indicadores-síntese, a produção e as organizações de mulheres com sede ali.</p></div></div>
   <div class="card" style="margin-bottom:16px"><div class="muni-search" style="max-width:520px"><label class="lbl" for="msq">Buscar município</label><input id="msq" class="inp" placeholder="Digite o nome do município" autocomplete="off"><ul class="sugg" id="msug" hidden></ul></div>
    ${ST.muni&&byCod.get(+ST.muni)?`<p class="note" style="margin-top:10px">Último visto: <button type="button" class="linkbtn mlink" data-c="${ST.muni}">${esc(byCod.get(+ST.muni).nome)} (${byCod.get(+ST.muni).uf}) →</button></p>`:''}</div>
   <div class="grid g3m">
-   <div class="card"><h2>Maiores produtores de arábica</h2><ul class="mlist">${li(top(m=>m.esp2==='Arábica'),m=>`${n0(m.pam_t)} t · ${n0(m.censo_cafe)} estab. com café`)}</ul></div>
-   <div class="card"><h2>Maiores produtores de canéfora</h2><ul class="mlist">${li(top(m=>m.esp2==='Canéfora'),m=>`${n0(m.pam_t)} t · ${n0(m.censo_cafe)} estab. com café`)}</ul></div>
-   <div class="card"><h2>Territórios prioritários</h2><ul class="mlist">${li(pri,m=>`cerca de ${n0(m.proxy_m)} mulheres na direção · nenhuma organização mapeada`)}</ul><p class="note"><a href="#mapa" data-ind="prio" id="toprio">Ver os ${MUN.filter(m=>m.prio).length} no mapa →</a></p></div>
+   <div class="card"><h2>Maiores produtores de arábica</h2><p class="note" style="margin:-6px 0 8px">Quantidade produzida no Censo 2017 (tabela 6955)</p><ul class="mlist">${li(top(m=>m.esp2==='Arábica'),m=>`${n0(cq(m))} t · ${n0(m.censo_cafe)} estab. com café`)}</ul></div>
+   <div class="card"><h2>Maiores produtores de canéfora</h2><p class="note" style="margin:-6px 0 8px">Quantidade produzida no Censo 2017 (tabela 6955)</p><ul class="mlist">${li(top(m=>m.esp2==='Canéfora'),m=>`${n0(cq(m))} t · ${n0(m.censo_cafe)} estab. com café`)}</ul></div>
+   <div class="card"><h2>Sem organização mapeada</h2><p class="note" style="margin:-6px 0 8px">Municípios com mais mulheres dirigentes estimadas (Censo 2017) e nenhuma organização no mapeamento feito na web</p><ul class="mlist">${li(pri,m=>`cerca de ${n0(m.proxy_m)} mulheres na direção (estimativa)`)}</ul><p class="note"><a href="#mapa" data-ind="prio" id="toprio">Ver os ${MUN.filter(m=>m.prio).length} no mapa →</a></p></div>
   </div>`);
   muniSearch(); document.querySelectorAll('.mlink').forEach(b=>b.onclick=()=>goMuni(+b.dataset.c));
   const tp=$('#toprio'); if(tp)tp.onclick=()=>{ST.ind='prio';save()};
@@ -724,7 +726,8 @@ function vSobre(){
    <p>O objetivo é apoiar <b>gestoras e gestores públicos e tomadores de decisão</b>, <b>pesquisadoras e pesquisadores</b>, <b>equipes de assistência técnica e extensão rural</b>, <b>cooperativas e organizações</b> e as <b>próprias mulheres cafeicultoras</b>. O Atlas ajuda a orientar políticas, pesquisas e ações nos territórios onde elas fazem mais diferença.</p>
    <p>O Atlas combina dados oficiais do IBGE (Censo Agropecuário 2017 e Produção Agrícola Municipal), parte dos dados do painel Café em Números e um mapeamento de organizações e iniciativas de mulheres do café. Ele está organizado em cinco módulos: Indicadores, Mapas, Municípios, Organizações e Histórias.</p></div>
   <div class="grid g2"><div class="card"><h2>O que os números medem</h2><p>Os estabelecimentos com café (tabela 6955 do Censo Agropecuário 2017) e a estimativa de mulheres na direção por espécie foram trazidos do <a href="https://www.embrapa.br/web/cafe/painel-cafe-em-numeros" target="_blank" rel="noopener">painel Café em Números</a>, da Embrapa Café e da Embrapa Territorial. O IBGE não publica o café por sexo. Por isso, o número de mulheres é uma estimativa: em cada município, os estabelecimentos com café são multiplicados pela proporção de mulheres entre quem dirige os estabelecimentos agropecuários. O único dado observado de café por sexo é o dos estabelecimentos que têm o café como <b>atividade principal</b> (tabela 6883): 136,6 mil no país.</p>
-  <p>Orientação técnica, cooperativismo, tratores e raça/cor das dirigentes valem para todas as atividades agropecuárias do município, porque o IBGE não publica esses temas cruzados com o café. O acesso a crédito por sexo não está publicado no SIDRA.</p></div>
+  <p>Orientação técnica, cooperativismo, tratores e raça/cor das dirigentes valem para todas as atividades agropecuárias do município, porque o IBGE não publica esses temas cruzados com o café. O acesso a crédito por sexo não está publicado no SIDRA.</p>
+  <p><b>Censo e PAM.</b> Todo número sobre mulheres e homens vem do Censo Agropecuário 2017, a única fonte com dado por sexo. A Produção Agrícola Municipal (PAM) mede a produção do município, sem informação sobre quem produz, e aparece no Atlas só como menção à parte, com o ano indicado. Proporções do Censo não são aplicadas a valores ou quantidades da PAM.</p></div>
   <div class="card"><h2>Organizações</h2><p>O cadastro reúne ${D.orgs.length} iniciativas (${D.orgs.filter(o=>o.escopo==='Brasil').length} no Brasil) identificadas em sites, notícias e publicações, com busca sistemática no Google (28 consultas fixas, páginas 1 a 5) e consulta a órgãos de assistência técnica, cooperativas, Embrapa e trabalhos acadêmicos, em novembro de 2026. Nenhuma foi validada diretamente com as organizações ainda. Quando a ausência de presença digital esconde um grupo, ele pode ser incluído pelo futuro formulário de cadastro.</p><p>Não publicamos contatos pessoais de lideranças.</p></div></div>`);
 }
 })();

@@ -128,6 +128,7 @@ main{display:flex;flex-direction:column;gap:56px;padding-block:56px 32px}
 .money>div{border-radius:12px;padding:16px;background:var(--surface-2);min-width:0}
 .money .v{font-family:var(--f-display);font-size:30px;font-weight:600;color:var(--leaf);line-height:1.1}
 .money p{margin:6px 0 0;font-size:13.5px;color:var(--ink-2)}
+.money .src{display:block;margin-top:8px;font-size:11.5px;color:var(--ink-2);opacity:.85}
 .money .big{grid-column:1/-1;background:var(--leaf-soft)}
 .money .big .v{font-size:40px}
 @media (max-width:480px){.money{grid-template-columns:minmax(0,1fr)}}
@@ -156,7 +157,7 @@ footer .cta:hover{background:var(--wine-2)}
       <b>Atlas das<br>Mulheres do Café</b>
     </a>
     <h1>O café que elas fazem e <em>as estatísticas não contam</em></h1>
-    <p>Estima-se que mais de 100 mil mulheres trabalhem no café da família sem serem reconhecidas como produtoras. Os dados do IBGE mostram onde está esse trabalho e quanto ele vale.</p>
+    <p>Estima-se que mais de 100 mil mulheres trabalhem no café da família sem serem reconhecidas como produtoras. Os dados do IBGE, de fontes e anos diferentes, permitem estimar onde está esse trabalho e quanto ele valeria.</p>
     <a class="cta" href="atlas/">Explorar o Atlas completo <span aria-hidden="true">→</span></a>
   </div></div>
 </header>
@@ -178,7 +179,7 @@ footer .cta:hover{background:var(--wine-2)}
       </div>
       <div class="stat">
         <div class="v num">1 em 2</div>
-        <p>mulheres que dirigem o estabelecimento ficam fora das estatísticas por sexo</p>
+        <p>mulheres que dirigem estabelecimentos de lavoura permanente nos municípios com café ficam fora das estatísticas por sexo</p>
         <span class="tag">Censo Agro 2017</span>
       </div>
       <div class="stat">
@@ -187,9 +188,9 @@ footer .cta:hover{background:var(--wine-2)}
         <span class="tag">PNAD Contínua 2022</span>
       </div>
       <div class="stat">
-        <div class="v num" id="k4">R$ 2,4 <small>bi/ano</small></div>
-        <p>é quanto valeria esse trabalho não pago, na lavoura e em casa, a um salário mínimo</p>
-        <span class="tag est" id="t4">estimativa</span>
+        <div class="v num" id="k4">R$ 1,1 <small>bi/ano</small></div>
+        <p>valeria o trabalho dessas mulheres na lavoura da família, em meio período, a um salário mínimo de 2026</p>
+        <span class="tag est" id="t4">estimativa · Censo 2017 e salário mínimo 2026</span>
       </div>
     </div>
   </section>
@@ -200,8 +201,8 @@ footer .cta:hover{background:var(--wine-2)}
     <div class="txt">
       <span class="eyebrow">Na lavoura</span>
       <h2 id="b1">Quase um terço da mão de obra familiar do café é feminina</h2>
-      <p>O Censo Agro conta quem trabalha no estabelecimento com laço de parentesco com o produtor. No café, as mulheres são <strong class="num" id="pct-fam">29%</strong> dessa mão de obra. Entre quem é registrado como produtor, elas são poucas.</p>
-      <p>Há mais mulheres trabalhando no café da própria família do que mulheres contratadas: cerca de 49,5 mil, entre permanentes, temporárias e parceiras.</p>
+      <p>O Censo Agro conta quem trabalha no estabelecimento com laço de parentesco com o produtor. No café, as mulheres são <strong class="num" id="pct-fam">29%</strong> dessa mão de obra. Entre quem é registrado como produtor nos estabelecimentos com café como atividade principal, elas são 10,5%.</p>
+      <p>Há mais mulheres trabalhando no café da própria família do que mulheres contratadas: cerca de 49,5 mil, entre permanentes, temporárias e parceiras, nos estabelecimentos com café como atividade principal (Censo Agro 2017, tabela 6887).</p>
     </div>
     <div class="panel">
       <h3>Mão de obra familiar com 14 anos ou mais, por estado</h3>
@@ -217,22 +218,23 @@ footer .cta:hover{background:var(--wine-2)}
       <span class="eyebrow">Na direção</span>
       <h2 id="b2">Quando o casal dirige junto, quase sempre só ele aparece</h2>
       <p>O Censo registra um único produtor por estabelecimento, e todas as tabelas por sexo usam esse registro. Quando a direção é do casal, quem é anotado como produtor costuma ser o homem.</p>
-      <p>Somando as que dirigem sozinhas e as que dirigem com o marido, as mulheres estão na direção de 26% dos estabelecimentos. As estatísticas por sexo mostram só 13%.</p>
-      <p class="quote">Quando o casal dirige junto, 85% das vezes só o homem é registrado como produtor.</p>
+      <p>Somando as que dirigem sozinhas e as que dirigem com o marido, as mulheres estão na direção de 26% dos estabelecimentos de lavoura permanente nos municípios com café. As estatísticas por sexo mostram 12,6%. O Censo só publica esse dado por grupo de atividade, um recorte mais largo que o café, e não informa o sexo do cônjuge: quando o casal dirige e quem respondeu foi o homem, considera-se que a mulher divide a direção.</p>
+      <p class="quote">Quando o casal dirige junto, 86% das vezes só o homem é registrado como produtor.</p>
     </div>
     <div class="panel">
       <h3>Presença das mulheres na direção dos estabelecimentos</h3>
       <p class="sub">Lavouras permanentes nos municípios cafeeiros, % dos estabelecimentos</p>
       <div class="legend"><span><i style="background:var(--w-bar)"></i>Registrada como produtora</span><span><i style="background:var(--hidden-bar)"></i>Dirige com o marido, ele é registrado</span></div>
-      <div class="stack" role="img" aria-label="13,1% registradas como produtoras e mais 13,0% que dirigem com o marido sem registro, total de 26%">
-        <div class="s1" style="width:43.7%">13,1%</div><div class="s2" style="width:43.3%">13,0%</div>
+      <div class="stack" role="img" aria-label="12,6% registradas como produtoras e mais 13,2% que dirigem com o marido sem registro, total de 25,8%">
+        <div class="s1" style="width:42%">12,6%</div><div class="s2" style="width:44%">13,2%</div>
       </div>
       <div class="axis"><span>0%</span><span>30%</span></div>
       <div class="couple" role="img" aria-label="De cada 20 casais que dirigem juntos, 17 têm o homem registrado e 3 a mulher" id="couple"></div>
       <p class="note">Cada ponto é 1 em cada 20 estabelecimentos dirigidos pelo casal: 17 têm o homem registrado como produtor, 3 têm a mulher.</p>
       <div class="ufrank" aria-label="Parcela de mulheres dirigentes que ficam fora das estatísticas, por estado">
-        <div><b class="num">56%</b>Minas Gerais</div><div><b class="num">57%</b>Espírito Santo</div><div><b class="num">58%</b>Rondônia</div><div><b class="num">28%</b>Bahia</div>
+        <div><b class="num">56%</b>Minas Gerais</div><div><b class="num">57%</b>Espírito Santo</div><div><b class="num">58%</b>Rondônia</div><div><b class="num">29%</b>Bahia</div>
       </div>
+      <p class="note">Parcela das mulheres na direção que ficam fora das estatísticas por sexo, por estado. Censo Agro 2017, tabela 6768.</p>
     </div>
   </section>
 
@@ -241,15 +243,15 @@ footer .cta:hover{background:var(--wine-2)}
       <span class="eyebrow">Em casa e no valor</span>
       <h2 id="b3">A jornada não termina na lavoura</h2>
       <p>Nos estados do café, as mulheres dedicam em média 22 horas por semana a afazeres domésticos e ao cuidado de pessoas. Os homens dedicam 11.</p>
-      <p>Pagas a um salário mínimo, as horas de lavoura e de casa dessas mulheres somariam bilhões de reais por ano. É um piso: a diária da colheita costuma ser maior.</p>
+      <p>Os valores abaixo vêm de fontes diferentes e por isso aparecem separados, cada um com a sua origem. A salário mínimo, são um piso: a diária da colheita costuma ser maior.</p>
     </div>
     <div class="panel">
       <h3>Quanto vale o que não é pago</h3>
       <p class="sub" id="b3-sub">Estabelecimentos com café (estimativa), por ano, a um salário mínimo de 2026</p>
       <div class="money">
-        <div><div class="v num" id="m1">R$ 1,1 bi</div><p>trabalho na lavoura da família, sem registro, em meio período</p></div>
-        <div><div class="v num" id="m2">R$ 1,3 bi</div><p>afazeres domésticos e cuidados</p></div>
-        <div class="big"><div class="v num">R$ 8,4 bi</div><p>da produção de café de 2025 vem de estabelecimentos dirigidos por mulheres, que têm 8,4% da área</p></div>
+        <div><div class="v num" id="m1">R$ 1,1 bi</div><p>trabalho na lavoura da família, sem registro, em meio período</p><span class="src">Censo Agro 2017 (6887 e 6883) e salário mínimo de 2026</span></div>
+        <div><div class="v num" id="m2">R$ 1,3 bi</div><p>afazeres domésticos e cuidados</p><span class="src">Mulheres da família (Censo Agro 2017) e horas da PNAD Contínua 2022 (7015)</span></div>
+        <div class="big"><div class="v num">R$ 1,37 bi</div><p>do valor da produção de café registrado no Censo Agro 2017 (R$ 16,3 bi) corresponde à participação das mulheres na área dos estabelecimentos com café como atividade principal (8,4%). É uma aproximação: o IBGE não publica o valor da produção por sexo. Pela participação no trabalho (24,3%), seriam R$ 4,0 bi. Como menção, na PAM 2025 o valor da produção de café no Brasil foi de R$ 100 bi, número sem dado por sexo e que não entra nesta conta.</p><span class="src">Censo Agro 2017, tabelas 6955 (valor da produção) e 6883 (área por sexo); PAM 2025 só como menção</span></div>
       </div>
       <p class="note">O valor da lavoura varia de R$ 0,6 a 2,3 bi por ano conforme a dedicação suposta (3 meses, meio período ou tempo integral).</p>
     </div>
@@ -258,28 +260,29 @@ footer .cta:hover{background:var(--wine-2)}
   <section class="fine" aria-labelledby="b4">
     <h2 id="b4">Como chegamos a esses números</h2>
     <ul>
-      <li>Dados públicos do IBGE: Censo Agropecuário 2017 (tabelas 6887, 6883 e 6768 do SIDRA), PNAD Contínua 2022 (tabela 7015) e PAM 2025.</li>
+      <li>Dados públicos do IBGE: Censo Agropecuário 2017 (tabelas 6887, 6883 e 6768 do SIDRA), PNAD Contínua 2022 (tabela 7015) e PAM 2025. Só o Censo tem dados por sexo. A PAM mede a produção do município, sem informação sobre quem produz, e aparece só como menção à parte.</li>
       <li>"Café como atividade principal" usa o dado direto do Censo. "Onde há café" estende a conta aos 264 mil estabelecimentos com café e é uma estimativa.</li>
       <li>O Censo não mede horas na lavoura. O valor usa o salário mínimo de 2026 (R$ 1.621) e supõe meio período ao longo do ano.</li>
       <li>As horas domésticas são a média de todas as mulheres de cada estado. A PNAD não separa a área rural por estado nessa tabela.</li>
-      <li>O IBGE não publica o valor da produção por sexo. Os R$ 8,4 bi aplicam a parcela de área das mulheres ao valor da produção, supondo a mesma produtividade.</li>
+      <li>O IBGE não publica o valor da produção por sexo. Os R$ 1,37 bi aplicam a parcela de área das mulheres (tabela 6883) ao valor da produção de café do próprio Censo 2017 (tabela 6955, arábica e canéfora, estabelecimentos com 50 pés ou mais), supondo a mesma produtividade por hectare. Pela participação das mulheres no pessoal ocupado (24,3%, tabela 6887), seriam R$ 4,0 bi.</li>
+      <li>A participação na direção (26% e 12,6%) e a parcela fora das estatísticas são do grupo lavoura permanente nos municípios com café (tabela 6768), porque o Censo não publica esse dado só para o café. Municípios com café são os que têm, no próprio Censo 2017, 20 ou mais estabelecimentos com café como atividade principal, 50 ou mais estabelecimentos com café ou 100 t ou mais de café produzidas.</li>
       <li>Meninas com menos de 14 anos que trabalham no café não entram em nenhum valor.</li>
     </ul>
   </section>
 
   <footer>
-    <span>Fontes: IBGE (Censo Agropecuário 2017, PNAD Contínua 2022, PAM 2025). Valores estimados, versão preliminar de novembro de 2026.</span>
+    <span>Fontes: IBGE (Censo Agropecuário 2017, PNAD Contínua 2022; PAM 2025 só como menção). Valores estimados, versão preliminar de novembro de 2026.</span>
     <a class="cta" href="atlas/">Ver mapas e organizações no Atlas <span aria-hidden="true">→</span></a>
   </footer>
 </main>
 
 <script>
 const D={
-  onde:{k1:'116 mil',k4:'R$ 2,4 <small>bi/ano</small>',m1:'R$ 1,1 bi',m2:'R$ 1,3 bi',pct:'29%',est:true,
+  onde:{k1:'116 mil',k4:'R$ 1,1 <small>bi/ano</small>',m1:'R$ 1,1 bi',m2:'R$ 1,3 bi',pct:'29%',est:true,
     sub1:'Estabelecimentos com café (estimativa). Os seis estados com mais mulheres.',
     sub3:'Estabelecimentos com café (estimativa), por ano, a um salário mínimo de 2026',
     uf:[['MG',60839,173157],['ES',50711,106407],['BA',13543,27707],['RO',13166,23870],['PR',4304,12518],['SP',3119,13744]]},
-  princ:{k1:'68 mil',k4:'R$ 1,4 <small>bi/ano</small>',m1:'R$ 0,7 bi',m2:'R$ 0,7 bi',pct:'29%',est:false,
+  princ:{k1:'68 mil',k4:'R$ 0,7 <small>bi/ano</small>',m1:'R$ 0,7 bi',m2:'R$ 0,7 bi',pct:'29%',est:false,
     sub1:'Estabelecimentos com café como atividade principal (dado direto do Censo).',
     sub3:'Estabelecimentos com café como atividade principal, por ano, a um salário mínimo de 2026',
     uf:[['MG',53503,136844],['ES',14090,27570],['BA',6959,13208],['PR',3702,8033],['SP',3038,10427],['RO',119,234]]}
@@ -290,7 +293,7 @@ function render(key){
   const d=D[key];
   $('k1').textContent=d.k1; $('k4').innerHTML=d.k4; $('m1').textContent=d.m1; $('m2').textContent=d.m2;
   $('pct-fam').textContent=d.pct; $('b1-sub').textContent=d.sub1; $('b3-sub').textContent=d.sub3;
-  ['t1','t4'].forEach(t=>{const el=$(t); el.textContent=d.est?'estimativa':'Censo Agro 2017'; el.classList.toggle('est',d.est)});
+  $('t1').textContent=d.est?'estimativa':'Censo Agro 2017'; $('t1').classList.toggle('est',d.est);
   const max=Math.max(...d.uf.map(r=>r[2]));
   $('pairs').innerHTML=d.uf.map(([uf,m,h])=>{
     const pm=100*m/(m+h);
