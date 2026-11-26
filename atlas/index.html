@@ -109,6 +109,8 @@ button,select,input{font:inherit;color:inherit}
 .pair .m i{background:var(--wine-2)}.pair .h i{background:#B9AEA6}
 .pair b{font-variant-numeric:tabular-nums;text-align:right;font-size:13px}
 .g3m{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px}
+.nav{min-width:0}.kpis.k3{grid-template-columns:repeat(3,minmax(0,1fr))}@media (max-width:700px){.kpis.k3{grid-template-columns:minmax(0,1fr)}}.efil{align-items:flex-end;margin-bottom:12px}.efil .lbl{display:block;margin-bottom:4px}
+.elist{display:flex;flex-direction:column;gap:12px}.elist .est{border-bottom:1px solid var(--line);padding-bottom:10px;min-width:0}.elist .est a{color:var(--ink);font-weight:600;text-decoration:none;overflow-wrap:anywhere}.elist .est a:hover{text-decoration:underline}
 .mlist{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:4px}
 .mlink{display:flex;flex-direction:column;align-items:flex-start;gap:2px;width:100%;text-align:left;background:none;border:0;border-radius:8px;padding:8px 10px;cursor:pointer;font:inherit;color:var(--ink)}
 .mlink:hover{background:var(--surface-2)}.mlink span{font-size:12.5px;color:var(--ink-2)}
@@ -254,7 +256,7 @@ dl.facts dt{color:var(--ink-2)}dl.facts dd{margin:0;min-width:0;overflow-wrap:an
     <b>Atlas das<br>Mulheres do Café</b>
   </a>
   <nav class="nav" aria-label="Seções">
-    <a href="#inicio" data-r="inicio">Início</a><a href="#panorama" data-r="panorama">Indicadores</a><a href="#mapa" data-r="mapa">Mapas</a><a href="#municipios" data-r="municipios">Municípios</a><a href="#organizacoes" data-r="organizacoes">Organizações</a><a href="#historias" data-r="historias">Histórias</a><a href="#sobre" data-r="sobre">Sobre</a>
+    <a href="#inicio" data-r="inicio">Início</a><a href="#panorama" data-r="panorama">Indicadores</a><a href="#mapa" data-r="mapa">Mapas</a><a href="#municipios" data-r="municipios">Municípios</a><a href="#organizacoes" data-r="organizacoes">Organizações</a><a href="#estudos" data-r="estudos">Estudos</a><a href="#historias" data-r="historias">Histórias</a><a href="#sobre" data-r="sobre">Sobre</a>
   </nav>
 </div></header>
 <main id="app"><div class="loading">Carregando dados do Atlas…</div></main>
@@ -328,13 +330,13 @@ window.addEventListener('hashchange',route);
 function route(){
   if(!D)return;
   const r=(location.hash||'#inicio').slice(1)||'inicio';
-  const views={inicio:vHome,panorama:vPanorama,mapa:vMapa,municipios:vMuniHome,municipio:vMuni,organizacoes:vOrgs,organizacao:vOrg,historias:vHist,sobre:vSobre};
+  const views={inicio:vHome,panorama:vPanorama,mapa:vMapa,municipios:vMuniHome,municipio:vMuni,organizacoes:vOrgs,organizacao:vOrg,historias:vHist,sobre:vSobre,estudos:vEstudos};
   const fn=views[r]||vHome;
   document.querySelectorAll('.nav a').forEach(a=>{const on=a.dataset.r===r||(r==='organizacao'&&a.dataset.r==='organizacoes')||(r==='municipio'&&a.dataset.r==='municipios')||(r==='panorama'&&a.dataset.r==='panorama');a.toggleAttribute('aria-current',on);if(on)a.setAttribute('aria-current','page')});
   app.innerHTML=''; fn(); window.scrollTo(0,0);
 }
 function rail(cur){
-  const it=[['panorama','Indicadores',IC.chart],['mapa','Mapas',IC.map],['municipios','Municípios',IC.pin],['organizacoes','Organizações',IC.people],['historias','Histórias',IC.leaf]];
+  const it=[['panorama','Indicadores',IC.chart],['mapa','Mapas',IC.map],['municipios','Municípios',IC.pin],['organizacoes','Organizações',IC.people],['estudos','Estudos',IC.chart],['historias','Histórias',IC.leaf]];
   return `<nav class="rail" aria-label="Módulos">${it.map(([h,l,i])=>`<a href="#${h}" ${cur===h||(cur==='municipio'&&h==='municipios')?'aria-current="page"':''}>${i}${l}</a>`).join('')}<span>${IC.cal}Séries históricas <small>em breve</small></span></nav>`;
 }
 function shell(cur,html){app.innerHTML=`<div class="wrap view"><div class="shell">${rail(cur)}<div style="min-width:0">${html}</div></div></div>`}
@@ -377,6 +379,7 @@ function vHome(){
     <a href="#mapa">${IC.map}<div><b>Mapas</b><span>interativos</span></div></a>
     <a href="#municipios">${IC.pin}<div><b>Municípios</b><span>diagnóstico de cada município</span></div></a>
     <a href="#organizacoes">${IC.people}<div><b>Organizações</b><span>de mulheres</span></div></a>
+    <a href="#estudos">${IC.chart}<div><b>Estudos</b><span>da Embrapa com autoras</span></div></a>
     <a href="#historias">${IC.leaf}<div><b>Histórias</b><span>e boas práticas (em construção)</span></div></a>
   </nav>
   <section class="home-sec"><div class="big-nums">
@@ -643,6 +646,34 @@ function vMuniHome(){
   </div>`);
   muniSearch(); document.querySelectorAll('.mlink').forEach(b=>b.onclick=()=>goMuni(+b.dataset.c));
   const tp=$('#toprio'); if(tp)tp.onclick=()=>{ST.ind='prio';save()};
+}
+let EST=null;
+function vEstudos(){
+  if(!EST){shell('estudos','<div class="loading">Carregando os estudos…</div>');fetch('estudos_autoras.json').then(r=>r.json()).then(d=>{EST=d;if(location.hash==='#estudos')vEstudos()}).catch(()=>{app.innerHTML='<div class="loading">Não foi possível carregar os estudos. Recarregue a página.</div>'});return}
+  const M=EST.meta, C=EST.cols, L=EST.docs.map(a=>Object.fromEntries(C.map((c,i)=>[c,a[i]])));
+  const anos=[...new Set(L.map(d=>d.ano))].sort((a,b)=>b-a), subs=[...new Set(L.map(d=>d.subtipo).filter(Boolean))].sort();
+  const F={q:'',ano:'',sub:'',n:30};
+  shell('estudos',`<div class="page-h"><div><h1>Estudos da Embrapa sobre café com autoras</h1><p>Publicações e projetos de cafeicultura da Embrapa em que pelo menos uma das pessoas da Embrapa identificadas na autoria, ou na liderança do projeto, é mulher.</p></div></div>
+  <div class="kpis k3">
+   ${kpi(IC.chart,n0(M.publicacoes_com_autora)+' de '+n0(M.publicacoes_identificadas),'publicações de café com autoria da Embrapa identificada têm ao menos uma autora ('+pc(100*M.publicacoes_com_autora/M.publicacoes_identificadas)+')',1)}
+   ${kpi(IC.woman,n0(M.projetos_com_lider_mulher)+' de '+n0(M.projetos),'projetos de café no Redape são liderados por uma mulher')}
+   ${kpi(IC.people,n0(M.recorte_total),'documentos no recorte de cafeicultura (publicações, projetos e soluções tecnológicas)')}
+  </div>
+  <div class="card"><div class="filters efil">
+    <div style="flex:1 1 260px;min-width:0"><label class="lbl" for="eq">Buscar no título ou no tema</label><input id="eq" class="inp" placeholder="Ex.: broca, conilon, qualidade" autocomplete="off"></div>
+    <div><label class="lbl" for="eano">Ano</label><select id="eano" class="sel"><option value="">Todos</option>${anos.map(a=>`<option>${a}</option>`).join('')}</select></div>
+    <div style="min-width:0"><label class="lbl" for="esub">Tipo</label><select id="esub" class="sel"><option value="">Todos</option>${subs.map(t=>`<option>${esc(t)}</option>`).join('')}</select></div>
+   </div>
+   <p class="note" id="ecount" style="margin:0 0 8px"></p><div id="elist" class="elist"></div>
+   <p style="margin-top:12px"><button type="button" class="linkbtn" id="emore">Mostrar mais</button></p></div>
+  <p class="note">Recorte de cafeicultura da Embrapa (publicações contadas por obra, projetos e soluções tecnológicas), Redape, exportação de ${M.exportacao.split('-').reverse().join('/')}. Entram só pessoas da Embrapa identificadas no Observatório de Pesquisa da Embrapa (níveis A e B); autoras e autores externos não são considerados. Gênero pelo cargo ou função na página Equipe do portal da Embrapa (nov/2026) e, sem isso, estimado pelo primeiro nome (genderBR 1.4.0). As soluções tecnológicas não trazem autoria pessoal e ficam fora. Os nomes das pessoas não são listados aqui: cada estudo leva ao registro original.<br>Fontes: EMBRAPA. <i>Publicações da Embrapa</i>. Redape, DOI 10.48432/TRBT0S; EMBRAPA. <i>Projetos da Embrapa</i>. Redape, DOI 10.48432/EZDXWF.</p>`);
+  const norm=t=>(t||'').normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase();
+  const draw=()=>{const q=norm(F.q);const R=L.filter(d=>(!F.ano||String(d.ano)===F.ano)&&(!F.sub||d.subtipo===F.sub)&&(!q||norm(d.titulo+' '+d.tema).includes(q)));
+    $('#ecount').textContent=`${n0(R.length)} ${R.length===1?'estudo':'estudos'}`;
+    $('#elist').innerHTML=R.slice(0,F.n).map(d=>`<article class="est"><div class="lbl">${esc(d.subtipo||d.tipo)} · ${d.ano}${d.unidades?' · '+esc(d.unidades):''}</div><a href="${esc(d.link)}" target="_blank" rel="noopener">${esc(d.titulo)}</a>${d.tema?`<div class="note" style="margin:2px 0 0">Tema: ${esc(d.tema)}</div>`:''}</article>`).join('')||'<p class="note">Nenhum estudo com esses filtros.</p>';
+    $('#emore').hidden=R.length<=F.n};
+  $('#eq').oninput=e=>{F.q=e.target.value;F.n=30;draw()}; $('#eano').onchange=e=>{F.ano=e.target.value;F.n=30;draw()}; $('#esub').onchange=e=>{F.sub=e.target.value;F.n=30;draw()};
+  $('#emore').onclick=()=>{F.n+=30;draw()}; draw();
 }
 function vHist(){
   const tipos=[[IC.woman,'Relatos','Histórias contadas pelas próprias mulheres: trajetória na cafeicultura, sucessão familiar, conquistas e desafios. Em texto, foto, áudio ou vídeo curto, sempre com autorização de uso de imagem e voz.'],
