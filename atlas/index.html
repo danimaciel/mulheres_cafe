@@ -109,7 +109,9 @@ button,select,input{font:inherit;color:inherit}
 .pair .m i{background:var(--wine-2)}.pair .h i{background:#B9AEA6}
 .pair b{font-variant-numeric:tabular-nums;text-align:right;font-size:13px}
 .g3m{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px}
-.nav{min-width:0}.kpis.k3{grid-template-columns:repeat(3,minmax(0,1fr))}@media (max-width:700px){.kpis.k3{grid-template-columns:minmax(0,1fr)}}.efil{align-items:flex-end;margin-bottom:12px}.efil .lbl{display:block;margin-bottom:4px}
+.nav{min-width:0}@media (max-width:700px){.kpis.k3{grid-template-columns:minmax(0,1fr)}}.efil{align-items:flex-end;margin-bottom:12px}.efil .lbl{display:block;margin-bottom:4px}
+.kpi .kt{display:block;font-style:normal;font-weight:600;color:var(--wine);font-size:11.5px;text-transform:uppercase;letter-spacing:.04em;margin-bottom:3px}.kpis.k3{grid-template-columns:repeat(3,minmax(0,1fr))}.ptabs{display:flex;flex-wrap:wrap;gap:6px;margin:4px 0 18px;border-bottom:1px solid var(--line)}.ptabs button{background:none;border:0;padding:10px 14px;font:inherit;font-size:14px;color:var(--ink-2);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px}.ptabs button[aria-pressed=true]{color:var(--wine);font-weight:600;border-bottom-color:var(--wine)}.psec[hidden]{display:none}@media (max-width:700px){.kpis.k3{grid-template-columns:minmax(0,1fr)}}.org-layout>*{min-width:0}.mapbox{width:100%}
+.tbl{overflow-x:auto}.tbl table{width:100%;border-collapse:collapse;font-size:13.5px}.tbl th{text-align:left;font-weight:600;color:var(--ink-2);font-size:12px;padding:6px 8px;border-bottom:1px solid var(--line)}.tbl td{padding:6px 8px;border-bottom:1px solid var(--line)}.tbl .num{text-align:right;white-space:nowrap}.tbl td:first-child{white-space:nowrap}.tbl th.num{white-space:normal;vertical-align:bottom}
 .elist{display:flex;flex-direction:column;gap:12px}.elist .est{border-bottom:1px solid var(--line);padding-bottom:10px;min-width:0}.elist .est a{color:var(--ink);font-weight:600;text-decoration:none;overflow-wrap:anywhere}.elist .est a:hover{text-decoration:underline}
 .mlist{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:4px}
 .mlink{display:flex;flex-direction:column;align-items:flex-start;gap:2px;width:100%;text-align:left;background:none;border:0;border-radius:8px;padding:8px 10px;cursor:pointer;font:inherit;color:var(--ink)}
@@ -256,7 +258,7 @@ dl.facts dt{color:var(--ink-2)}dl.facts dd{margin:0;min-width:0;overflow-wrap:an
     <b>Atlas das<br>Mulheres do Café</b>
   </a>
   <nav class="nav" aria-label="Seções">
-    <a href="#inicio" data-r="inicio">Início</a><a href="#panorama" data-r="panorama">Indicadores</a><a href="#mapa" data-r="mapa">Mapas</a><a href="#municipios" data-r="municipios">Municípios</a><a href="#organizacoes" data-r="organizacoes">Organizações</a><a href="#estudos" data-r="estudos">Estudos</a><a href="#historias" data-r="historias">Histórias</a><a href="#sobre" data-r="sobre">Sobre</a>
+    <a href="#inicio" data-r="inicio">Início</a><a href="#panorama" data-r="panorama">Indicadores</a><a href="#mapa" data-r="mapa">Mapas</a><a href="#municipios" data-r="municipios">Municípios</a><a href="#organizacoes" data-r="organizacoes">Organizações</a><a href="#estudos" data-r="estudos">Estudos</a><a href="#sobre" data-r="sobre">Sobre</a>
   </nav>
 </div></header>
 <main id="app"><div class="loading">Carregando dados do Atlas…</div></main>
@@ -291,7 +293,7 @@ const IC={
  link:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"/></svg>'
 };
 let D=null, MUN=[], byCod=new Map(), TOPO=null, UFTOPO=null;
-const ST={muni:3169406, org:null, geo:'BR1', ptab:'idade', ind:'pct_est', scale:'mun', otipo:'', ouf:'', oq:'', oesc:'Brasil', esp:''};
+const ST={pmain:'geral',muni:3169406, org:null, geo:'BR1', ptab:'idade', ind:'pct_est', scale:'mun', otipo:'', ouf:'', oq:'', oesc:'Brasil', esp:''};
 try{const s=JSON.parse(localStorage.getItem('atlas-st')||'{}');Object.assign(ST,s)}catch(e){}
 if(ST.ind==='ipa')ST.ind='pct_est';
 const save=()=>{try{localStorage.setItem('atlas-st',JSON.stringify({muni:ST.muni,ind:ST.ind,geo:ST.geo}))}catch(e){}};
@@ -330,16 +332,21 @@ window.addEventListener('hashchange',route);
 function route(){
   if(!D)return;
   const r=(location.hash||'#inicio').slice(1)||'inicio';
-  const views={inicio:vHome,panorama:vPanorama,mapa:vMapa,municipios:vMuniHome,municipio:vMuni,organizacoes:vOrgs,organizacao:vOrg,historias:vHist,sobre:vSobre,estudos:vEstudos};
+  const views={inicio:vHome,panorama:vPanorama,mapa:vMapa,municipios:vMuniHome,municipio:vMuni,organizacoes:vOrgs,organizacao:vOrg,sobre:vSobre,estudos:vEstudos};
   const fn=views[r]||vHome;
   document.querySelectorAll('.nav a').forEach(a=>{const on=a.dataset.r===r||(r==='organizacao'&&a.dataset.r==='organizacoes')||(r==='municipio'&&a.dataset.r==='municipios')||(r==='panorama'&&a.dataset.r==='panorama');a.toggleAttribute('aria-current',on);if(on)a.setAttribute('aria-current','page')});
   app.innerHTML=''; fn(); window.scrollTo(0,0);
 }
 function rail(cur){
-  const it=[['panorama','Indicadores',IC.chart],['mapa','Mapas',IC.map],['municipios','Municípios',IC.pin],['organizacoes','Organizações',IC.people],['estudos','Estudos',IC.chart],['historias','Histórias',IC.leaf]];
+  const it=[['panorama','Indicadores',IC.chart],['mapa','Mapas',IC.map],['municipios','Municípios',IC.pin],['organizacoes','Organizações',IC.people],['estudos','Estudos',IC.chart]];
   return `<nav class="rail" aria-label="Módulos">${it.map(([h,l,i])=>`<a href="#${h}" ${cur===h||(cur==='municipio'&&h==='municipios')?'aria-current="page"':''}>${i}${l}</a>`).join('')}</nav>`;
 }
 function shell(cur,html){app.innerHTML=`<div class="wrap view"><div class="shell">${rail(cur)}<div style="min-width:0">${html}</div></div></div>`}
+function dirKpis(o){
+  const pObs=o.obs_t?100*o.obs_m/o.obs_t:null, pEst=o.est_t?100*o.est_m/o.est_t:null;
+  return kpi(IC.sprout,n0(o.obs_m)+' de '+n0(o.obs_t),`<em class="kt">Café como atividade principal</em>estabelecimentos dirigidos por mulheres${pObs!=null?' ('+pc(pObs)+')':''}. Dado observado, Censo 2017, tabela 6883`,1)
+   +kpi(IC.woman,'cerca de '+n0(o.est_m),`<em class="kt">Todos os estabelecimentos com café</em>mulheres e ${n0(o.est_h)} homens na direção dos ${n0(o.est_t)} estabelecimentos com café, inclusive os que têm café junto com outras atividades${pEst!=null?' ('+pc(pEst)+')':''}. Estimativa, tabelas 6955 e 6768${o.extra||''}`);
+}
 function kpi(ic,val,lab,g){return `<div class="kpi"><div class="ic ${g?'g':''}">${ic}</div><div><b>${val}</b><span>${lab}</span></div></div>`}
 const f2=v=>v==null?'–':v.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
 /* indicadores-síntese: o = {env:{t,m,h}, ampl, lp_m, codir, raz_area, prio, orgs_mil} */
@@ -371,7 +378,7 @@ function vHome(){
     <svg class="hero-wave hw-d" viewBox="0 0 600 600" preserveAspectRatio="none" aria-hidden="true"><path d="M0 0H560C470 90 610 200 520 300C430 400 600 470 500 600H0Z"/></svg>
     <svg class="hero-wave hw-m" viewBox="0 0 600 70" preserveAspectRatio="none" aria-hidden="true"><path d="M0 40C120 0 230 10 330 34C430 58 520 50 600 18V70H0Z"/></svg>
     <div class="hero-in"><div><h1>Mulheres que cultivam o café e transformam territórios</h1>
-    <p>Dados, mapas e histórias sobre a participação e a organização das mulheres na cafeicultura brasileira.</p>
+    <p>Dados e mapas sobre a participação e a organização das mulheres na cafeicultura brasileira.</p>
     <a class="cta" href="#panorama">Explorar o Atlas <span aria-hidden="true">→</span></a></div></div>
   </section>
   <nav class="mods" aria-label="Módulos do Atlas">
@@ -380,7 +387,6 @@ function vHome(){
     <a href="#municipios">${IC.pin}<div><b>Municípios</b><span>diagnóstico de cada município</span></div></a>
     <a href="#organizacoes">${IC.people}<div><b>Organizações</b><span>de mulheres</span></div></a>
     <a href="#estudos">${IC.chart}<div><b>Estudos</b><span>da Embrapa com autoras</span></div></a>
-    <a href="#historias">${IC.leaf}<div><b>Histórias</b><span>e boas práticas (em construção)</span></div></a>
   </nav>
   <section class="home-sec"><div class="big-nums">
     <div><b class="num">${n0(br.c50_arab+br.c50_cane)}</b><span>estabelecimentos com café no Brasil: ${n0(br.c50_arab)} com arábica e ${n0(br.c50_cane)} com canéfora</span></div>
@@ -422,37 +428,38 @@ function vPanorama(){
      ${[['Recebem orientação técnica',A.orient_tec],['Associadas a cooperativa',A.coop],['Têm trator',A.tratores]].map(([l,[m,h]])=>`<div class="pair"><span>${l}</span><div class="r m"><div class="t"><i style="width:${100*m/35}%"></i></div><b>${pc(m)}</b></div><div class="r h"><div class="t"><i style="width:${100*h/35}%"></i></div><b>${pc(h)}</b></div></div>`).join('')}
      <p class="note">${pc(g.negras_m)} das mulheres dirigentes desses municípios se declaram pretas ou pardas. ${g.orgs} organizações de mulheres mapeadas com sede neles.</p>
      <p class="note pam">Menção à PAM, à parte: em ${BRE.pam_ano}, a produção de ${nome.toLowerCase().split(' ')[0]} no Brasil foi de ${fmt.format(Math.round(prod/1000))} mil t. A PAM mede a produção do município e não tem dado por sexo.</p></div>`};
-  shell('panorama',`<div class="page-h"><div><h1>Indicadores</h1><p>Panorama da participação feminina na cafeicultura. Arábica e canéfora têm territórios, escalas e perfis de produtoras diferentes. Comece pela espécie e desça até o estado.</p></div>
-   <div class="filters"><span class="tag o">Censo Agropecuário 2017</span></div></div>
-  <div class="esp2">${espCard('Arábica','arab',BRE.estab_arabica,BRE.pam_arabica_t,ga,BRE.censo_arabica_t)}${espCard('Canéfora (conilon e robusta)','cane',BRE.estab_canefora,BRE.pam_canefora_t,gc,BRE.censo_canefora_t)}</div>
-  <p class="note">Espécie predominante do município: 80% ou mais da quantidade de café produzida no Censo 2017 (tabela 6955) de uma espécie; com sigilo do IBGE, vale o número de estabelecimentos com cada espécie. ${ES.grupos['Misto'].n_mun} municípios cafeeiros são mistos. "Mulheres na direção (estimativa)": estabelecimentos com a espécie em cada município × proporção de mulheres entre quem dirige no município (tabela 6768), o mesmo método do <a href="https://www.embrapa.br/web/cafe/painel-cafe-em-numeros" target="_blank" rel="noopener">painel Café em Números</a>. O IBGE não publica o café por sexo. Acesso a recursos: todas as mulheres (e homens) que dirigem estabelecimentos agropecuários nesses municípios.</p>
-
-  <div class="sec-h page-h"><div><h2>Por região e estado</h2><p>Escolha um recorte para ver quantos estabelecimentos têm café e quantas mulheres estão na direção.</p></div>
-   <div class="filters"><label class="lbl" for="pgeo" hidden>Recorte</label><select id="pgeo" class="sel">${geoOpts()}</select></div></div>
-  <div class="kpis">
-   ${kpi(IC.people,n0((g.c50_arab||0)+(g.c50_cane||0)),`estabelecimentos com café: ${n0(g.c50_arab)} com arábica e ${n0(g.c50_cane)} com canéfora; ${pc(100*g.u.fam[0]/g.u.fam[1])} da agricultura familiar`,1)}
-   ${kpi(IC.sprout,n0(g.estab_m)+' de '+n0(g.estab_t),`mulheres entre os que têm o café como atividade principal (dado observado, tabela 6883${g.estab_t?', '+pc(100*g.estab_m/g.estab_t):''})`,1)}
-   ${kpi(IC.woman,n0(g.u.est[2]),`mulheres e ${n0(g.u.est[1])} homens na direção de todos os estabelecimentos com café (estimativa, tabelas 6955 e 6768)`)}
-   ${kpi(IC.pct,pc(100*g.u.est[2]/g.u.est[0]),'participação feminina estimada na direção dos estabelecimentos com café')}
+  const PT=[['geral','Visão geral'],['especie','Por espécie'],['perfil','Perfil de quem dirige'],['acesso','Acesso a recursos']]; if(!PT.some(x=>x[0]===ST.pmain))ST.pmain='geral';
+  shell('panorama',`<div class="page-h"><div><h1>Indicadores</h1><p>Panorama da participação feminina na cafeicultura, com dados do Censo Agropecuário 2017.</p></div>
+   <div class="filters"><label class="lbl" for="pgeo">Território</label><select id="pgeo" class="sel">${geoOpts()}</select></div></div>
+  <div class="ptabs" role="tablist" aria-label="Grupos de indicadores">${PT.map(([k,l])=>`<button type="button" data-pm="${k}" aria-pressed="${ST.pmain===k}">${l}</button>`).join('')}</div>
+  <section class="psec" data-ps="geral" ${ST.pmain==='geral'?'':'hidden'}>
+  <div class="kpis k3">
+   ${kpi(IC.people,n0((g.c50_arab||0)+(g.c50_cane||0)),`estabelecimentos com café em ${esc(g.nome)}: ${n0(g.c50_arab)} com arábica e ${n0(g.c50_cane)} com canéfora; ${pc(100*g.u.fam[0]/g.u.fam[1])} da agricultura familiar. Tabela 6955`,1)}
+   ${dirKpis({obs_m:g.estab_m,obs_t:g.estab_t,est_m:g.u.est[2],est_h:g.u.est[1],est_t:g.u.est[0]})}
   </div>
   <h3 class="lbl" style="margin:4px 0 10px">Indicadores-síntese · municípios cafeeiros de ${esc(g.nome)} · Censo Agropecuário 2017</h3>
   ${sintCards({...g.sint,orgs_mil:g.orgs_mil})}
-  <div class="grid g2">
+  </section>
+  <section class="psec" data-ps="especie" ${ST.pmain==='especie'?'':'hidden'}>
+  <p class="note" style="margin:0 0 12px">Brasil. Arábica e canéfora têm territórios, escalas e perfis de produtoras diferentes.</p>
+  <div class="esp2">${espCard('Arábica','arab',BRE.estab_arabica,BRE.pam_arabica_t,ga,BRE.censo_arabica_t)}${espCard('Canéfora (conilon e robusta)','cane',BRE.estab_canefora,BRE.pam_canefora_t,gc,BRE.censo_canefora_t)}</div>
+  <p class="note">Espécie predominante do município: 80% ou mais da quantidade de café produzida no Censo 2017 (tabela 6955) de uma espécie; com sigilo do IBGE, vale o número de estabelecimentos com cada espécie. ${ES.grupos['Misto'].n_mun} municípios cafeeiros são mistos. "Mulheres na direção (estimativa)": estabelecimentos com a espécie em cada município × proporção de mulheres entre quem dirige no município (tabela 6768), o mesmo método do <a href="https://www.embrapa.br/web/cafe/painel-cafe-em-numeros" target="_blank" rel="noopener">painel Café em Números</a>. O IBGE não publica o café por sexo. Acesso a recursos: todas as mulheres (e homens) que dirigem estabelecimentos agropecuários nesses municípios.</p>
+  </section>
+  <section class="psec" data-ps="perfil" ${ST.pmain==='perfil'?'':'hidden'}><div class="grid g2">
    <div class="card"><h2>Perfil de quem dirige: mulheres e homens</h2><p class="note" style="margin:-6px 0 10px">Distribuição em % de quem dirige estabelecimentos agropecuários nos municípios com café. O IBGE não publica idade, escolaridade ou raça só para o café.</p>
      <div class="key"><span><i style="background:var(--wine-2)"></i>Mulheres</span><span><i style="background:#B9AEA6"></i>Homens</span></div>
      <div class="tabs" role="group" aria-label="Dimensão do perfil">${[['idade','Idade'],['escolaridade','Escolaridade'],['raca','Raça/cor']].map(([k,l])=>`<button data-t="${k}" aria-pressed="${ST.ptab===k}">${l}</button>`).join('')}</div>
      <div id="donut"></div>
      <p class="note" id="dnote"></p></div>
-   <div class="card"><h2>Quem dirige os estabelecimentos com café, por região</h2><p class="note" style="margin:-6px 0 10px">Estimativa: estabelecimentos com café (tabela 6955) × proporção de mulheres e homens entre quem dirige em cada município (tabela 6768). Passe o mouse para ver os números.</p>
-     <div class="key"><span><i style="background:var(--wine-2)"></i>Mulheres</span><span><i style="background:#D9D0C8"></i>Homens</span></div>
-     <div class="bars">${regs.map(([n,v])=>split(n,v)).join('')}</div>
-     <h2 style="margin-top:22px">Estados com mais de mil estabelecimentos com café</h2>
-     <div class="bars">${ufs.map(([n,v])=>split(n,v)).join('')}</div></div>
+
+  </div></section>
+  <section class="psec" data-ps="acesso" ${ST.pmain==='acesso'?'':'hidden'}><div class="grid">
    <div class="card" style="grid-column:1/-1"><h2>Acesso a recursos: mulheres e homens que dirigem</h2>
      <div class="key"><span><i style="background:var(--wine-2)"></i>Mulheres dirigentes</span><span><i style="background:#B9AEA6"></i>Homens dirigentes</span></div>
      ${[['Orientação técnica','orient'],['Associação a alguma entidade','assoc'],['Cooperativa','coop'],['Possui trator','trat']].map(([l,k])=>pair(l,100*A[k][0]/A[k][1],100*A[k][2]/A[k][3],50)).join('')}
      <p class="note">% de quem dirige estabelecimentos agropecuários (todas as atividades) nos municípios com café de ${esc(g.nome)} que tem cada recurso (Censo 2017, tabelas 6779, 6851 e 6869, sobre os estabelecimentos dirigidos pelo produtor da tabela 6776).</p></div>
-  </div>`);
+  </div></section>`);
+  document.querySelectorAll('.ptabs button').forEach(b=>b.onclick=()=>{ST.pmain=b.dataset.pm;document.querySelectorAll('.ptabs button').forEach(x=>x.setAttribute('aria-pressed',x===b));document.querySelectorAll('.psec').forEach(x=>x.hidden=x.dataset.ps!==ST.pmain)});
   $('#pgeo').value=ST.geo; $('#pgeo').onchange=e=>{ST.geo=e.target.value;save();vPanorama()};
   document.querySelectorAll('.tabs button').forEach(b=>b.onclick=()=>{ST.ptab=b.dataset.t;document.querySelectorAll('.tabs button').forEach(x=>x.setAttribute('aria-pressed',x===b));donut()});
   donut();
@@ -478,12 +485,41 @@ function vMapa(){
    <label class="tag o" style="cursor:pointer"><input type="checkbox" id="morg"> Mostrar organizações de mulheres</label></div></div>
   <div class="card"><div class="map-layout"><div class="mapbox" id="mapbox"><div class="zoom"><button id="zin" aria-label="Aproximar">+</button><button id="zout" aria-label="Afastar">−</button></div></div>
    <div><div class="lbl" style="margin-bottom:8px" id="mlegt"></div><ul class="scale" id="mleg" style="list-style:none;padding:0;margin:0"></ul>
-   <p class="note" id="mnote"></p></div></div></div>`);
+   <p class="note" id="mnote"></p></div></div></div>
+  <div class="sec-h page-h" style="margin-top:22px"><div><h2>Números do território</h2><p>Censo Agropecuário 2017. Escolha Brasil, uma região ou um estado.</p></div>
+   <div class="filters"><label class="lbl" for="mgeo">Território</label><select id="mgeo" class="sel">${geoOpts()}</select></div></div>
+  <div id="mterr"></div>`);
+  $('#mgeo').value=ST.geo; $('#mgeo').onchange=e=>{ST.geo=e.target.value;save();terr()}; terr();
   $('#mind').value=ST.ind; $('#mesc').value=ST.scale; $('#mesp').value=ST.esp||''; $('#mesp').onchange=e=>{ST.esp=e.target.value;save();paint()};
   $('#mind').onchange=e=>{ST.ind=e.target.value;save();paint()}; $('#mesc').onchange=e=>{ST.scale=e.target.value;paint()};
   $('#morg').onchange=paint;
   buildMap($('#mapbox'),{onClick:showTip});
   paint();
+}
+function terr(){
+  const g=D.geo[ST.geo]||D.geo.BR1, br=D.geo.BR1;
+  const regs=Object.values(D.geo).filter(v=>v.nivel==='Grande Região').map(v=>[v.nome,v.u.est]).sort((a,b)=>b[1][2]/b[1][0]-a[1][2]/a[1][0]);
+  const ufs=Object.values(D.geo).filter(v=>v.sigla&&(v.c50_arab||0)+(v.c50_cane||0)>=1000).map(v=>[v.nome,v.u.est]).sort((a,b)=>b[1][2]/b[1][0]-a[1][2]/a[1][0]);
+  const inT=m=>g===br||(g.sigla?m.uf===g.sigla:(g.nivel==='Grande Região'&&String(m.cod)[0]===String(Object.keys(D.geo).find(k=>D.geo[k]===g)).slice(1)));
+  const ms=MUN.filter(m=>inT(m)&&(m.censo_cafe||0)>0).sort((a,b)=>(b.proxy_m||0)-(a.proxy_m||0)).slice(0,15);
+  const nOrg=D.orgs.filter(o=>o.escopo==='Brasil'&&o.cod_ibge&&inT({cod:o.cod_ibge,uf:o.uf})).length;
+  $('#mterr').innerHTML=`<div class="kpis">
+    ${kpi(IC.people,n0((g.c50_arab||0)+(g.c50_cane||0)),`estabelecimentos com café em ${esc(g.nome)}. Tabela 6955`,1)}
+    ${dirKpis({obs_m:g.estab_m,obs_t:g.estab_t,est_m:g.u.est[2],est_h:g.u.est[1],est_t:g.u.est[0]})}
+    ${kpi(IC.pin,n0(nOrg),`organizações de mulheres com sede mapeada em ${esc(g.nome)} (levantamento na web, nov/2026)`)}
+   </div>
+   <div class="grid g2">
+   <div class="card"><h2>Quem dirige os estabelecimentos com café, por região e estado</h2><p class="note" style="margin:-6px 0 10px">Estimativa: estabelecimentos com café (tabela 6955) × proporção de mulheres e homens entre quem dirige em cada município (tabela 6768). Passe o mouse para ver os números.</p>
+     <div class="key"><span><i style="background:var(--wine-2)"></i>Mulheres</span><span><i style="background:#D9D0C8"></i>Homens</span></div>
+     <div class="bars">${regs.map(([n,v])=>split(n,v)).join('')}</div>
+     <h3 class="lbl" style="margin:18px 0 8px">Estados com mais de mil estabelecimentos com café</h3>
+     <div class="bars">${ufs.map(([n,v])=>split(n,v)).join('')}</div></div>
+    <div class="card"><h2>Municípios com mais mulheres na direção</h2><p class="note" style="margin:-6px 0 10px">${esc(g.nome)}: os 15 municípios com mais mulheres estimadas na direção de estabelecimentos com café. Clique para abrir o diagnóstico.</p>
+     <div class="tbl"><table><thead><tr><th>Município</th><th class="num">Estab. com café</th><th class="num">Mulheres (est.)</th><th class="num">Mulheres (ativ. principal)</th></tr></thead><tbody>
+     ${ms.map(m=>`<tr><td><button type="button" class="linkbtn mlink" data-c="${m.cod}">${esc(m.nome)} (${m.uf})</button></td><td class="num">${n0(m.censo_cafe)}</td><td class="num">${n0(m.proxy_m)}</td><td class="num">${m.estab_t?n0(m.estab_m):'–'}</td></tr>`).join('')}</tbody></table></div>
+     <p class="note">Estimativa: tabelas 6955 e 6768. Café como atividade principal: tabela 6883 (dado observado). Censo 2017.</p></div>
+   </div>`;
+  document.querySelectorAll('#mterr .mlink').forEach(b=>b.onclick=()=>goMuni(+b.dataset.c));
 }
 function buildMap(box,opt){
   const w=box.clientWidth||800,h=box.clientHeight||560;
@@ -599,9 +635,7 @@ function vMuni(){
    <div class="muni-search"><label class="lbl" for="msq">Buscar município</label><input id="msq" class="inp" placeholder="Digite o nome do município" autocomplete="off"><ul class="sugg" id="msug" hidden></ul></div></div>
   <div class="kpis">
    ${kpi(IC.people,n0(m.censo_cafe),`estabelecimentos com café: ${n0(m.c_arab)} com arábica e ${n0(m.c_cane)} com canéfora${m.fam!=null&&m.censo_cafe?`; ${pc(100*m.fam/m.censo_cafe)} da agricultura familiar`:''}`,1)}
-   ${kpi(IC.sprout,n0(m.estab_m)+' de '+n0(m.estab_t),'mulheres entre os que têm o café como atividade principal (dado observado, tabela 6883)',1)}
-   ${kpi(IC.woman,n0(m.proxy_m),`mulheres e ${n0(m.censo_cafe&&m.proxy_m!=null?m.censo_cafe-m.proxy_m:null)} homens na direção de todos os estabelecimentos com café (estimativa)`)}
-   ${kpi(IC.pct,m.censo_cafe&&m.proxy_m!=null?pc(100*m.proxy_m/m.censo_cafe):'–',`participação feminina estimada; no agro todo do município são ${n0(m.dir_m)} mulheres entre ${n0(m.dir_t)} dirigentes`)}
+   ${dirKpis({obs_m:m.estab_m,obs_t:m.estab_t,est_m:m.proxy_m,est_h:m.censo_cafe&&m.proxy_m!=null?m.censo_cafe-m.proxy_m:null,est_t:m.censo_cafe,extra:`. A proporção vem de todas as atividades do município: ${n0(m.dir_m)} mulheres entre ${n0(m.dir_t)} dirigentes`})}
   </div>
   <h3 class="lbl" style="margin:4px 0 10px">Indicadores-síntese · Censo Agropecuário 2017</h3>
   ${sintCards({ampl:m.ampl,lp_m:m.lp_m,codir:m.codir,env:{t:m.env_t,m:m.env_m,h:m.env_h},raz_area:m.raz_area,orgs_mil:m.proxy_m>=20?1000*m.n_org/m.proxy_m:null,prioFlag:m.prio})}
@@ -675,21 +709,6 @@ function vEstudos(){
   $('#eq').oninput=e=>{F.q=e.target.value;F.n=30;draw()}; $('#eano').onchange=e=>{F.ano=e.target.value;F.n=30;draw()}; $('#esub').onchange=e=>{F.sub=e.target.value;F.n=30;draw()};
   $('#emore').onclick=()=>{F.n+=30;draw()}; draw();
 }
-function vHist(){
-  const tipos=[[IC.woman,'Relatos','Histórias contadas pelas próprias mulheres: trajetória na cafeicultura, sucessão familiar, conquistas e desafios. Em texto, foto, áudio ou vídeo curto, sempre com autorização de uso de imagem e voz.'],
-   [IC.people,'Boas práticas','Experiências de grupos e organizações que deram certo, como comercialização conjunta, marcas próprias, cafés especiais, gestão, crédito e participação em cooperativas.'],
-   [IC.sprout,'Tecnologias e conhecimentos','Tecnologias, cultivares, práticas de manejo e cursos da Embrapa e de parceiros, ligados aos desafios que os indicadores mostram, como acesso à assistência técnica, mecanização e sucessão.']];
-  shell('historias',`<div class="page-h"><div><div class="lbl">Em construção</div><h1>Histórias</h1><p>Histórias e boas práticas. O lado humano do Atlas: quem são as mulheres por trás dos números, o que as organizações têm feito e que conhecimentos podem ajudar nos territórios.</p></div></div>
-  <div class="grid g3m">${tipos.map(([i,h,p])=>`<div class="card hcard"><span class="hic">${i}</span><h2>${h}</h2><p>${p}</p></div>`).join('')}</div>
-  <div class="grid g2" style="margin-top:16px">
-   <div class="card"><h2>Como cada história entra no Atlas</h2><ul class="find">
-    <li><span class="ok">${IC.pin}</span><span><b>Ligada a um lugar</b>: cada história tem município, espécie de café e, quando houver, a organização. Assim ela aparece no mapa e no diagnóstico municipal.</span></li>
-    <li><span class="ok">${IC.book}</span><span><b>Ligada a um tema</b>, como sucessão, assistência técnica, comercialização, cafés especiais, mecanização ou organização coletiva, para conversar com os indicadores.</span></li>
-    <li><span class="ok">${IC.check}</span><span><b>Com curadoria</b>: o envio passa por validação antes de ser publicado, com consentimento registrado, conforme a LGPD.</span></li></ul></div>
-   <div class="card"><h2>Envie uma história</h2><p>Em breve, um formulário vai permitir que mulheres, organizações e equipes técnicas enviem relatos, experiências e indicações de tecnologias. Enquanto isso, esta seção mostra como o conteúdo será organizado.</p>
-    <p class="note">O mesmo formulário servirá para cadastrar novas organizações de mulheres do café.</p></div>
-  </div>`);
-}
 function muniSearch(){
   const q=$('#msq'),s=$('#msug'); const norm=t=>t.normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase();
   q.oninput=()=>{const v=norm(q.value.trim()); if(v.length<2){s.hidden=true;return}
@@ -702,9 +721,30 @@ function muniSearch(){
 /* ---------- organizações ---------- */
 function orgRow(o){return `<button class="org" data-id="${o.id}" type="button"><span class="av">${IC.people}</span><span style="min-width:0"><b>${esc(o.nome)}</b><small>${o.municipio?esc(o.municipio)+' ('+o.uf+')':(o.uf?UFN[o.uf]||o.uf:o.pais)}${o.num_mulheres&&o.num_mulheres!=='Não localizado'?' · '+n0(+o.num_mulheres)+' mulheres':''}</small></span><span class="tag ${o.tipo==='Rede'?'g':''}">${esc(o.tipo)}</span></button>`}
 function bindOrgRows(){document.querySelectorAll('.org').forEach(b=>b.onclick=()=>{ST.org=b.dataset.id;location.hash='organizacao'})}
+function orgInd(){
+  const B=D.orgs.filter(o=>o.escopo==='Brasil'), I=D.orgs.length-B.length;
+  const cnt=f=>{const c={};B.forEach(o=>{(f(o)||[]).forEach(k=>{if(k)c[k]=(c[k]||0)+1})});return Object.entries(c).sort((a,b)=>b[1]-a[1])};
+  const tip=cnt(o=>[o.tipo]), uf=cnt(o=>[o.uf?UFN[o.uf]||o.uf:'Atuação nacional']), ar=cnt(o=>(o.areas_atuacao||'').split('; ').map(x=>x.replace('Concurso/premiação','Concursos/premiação'))).slice(0,6);
+  const nm=B.filter(o=>/^\d+$/.test(String(o.num_mulheres))), fund=B.filter(o=>/^\d{4}$/.test(o.ano_fundacao)), rec=fund.filter(o=>+o.ano_fundacao>=2015).length;
+  const vf=cnt(o=>[o.grau_verificacao]);
+  const bars=(arr,tot)=>arr.map(([l,v])=>`<div class="bar"><span>${esc(l)}</span><div class="t"><i style="width:${100*v/arr[0][1]}%"></i></div><span class="v">${v}</span></div>`).join('');
+  return `<div class="kpis">
+    ${kpi(IC.people,n0(B.length),`organizações de mulheres do café no Brasil (e mais ${I} no exterior)`,1)}
+    ${kpi(IC.pin,n0(B.filter(o=>o.cod_ibge).length),'com sede ou município de referência identificado')}
+    ${kpi(IC.cal,fund.length?n0(rec)+' de '+n0(fund.length):'–',`criadas de 2015 em diante, entre as que têm ano de fundação localizado (${n0(fund.length)} de ${n0(B.length)})`)}
+    ${kpi(IC.woman,n0(nm.reduce((a,o)=>a+ +o.num_mulheres,0)),`mulheres participantes informadas por ${n0(nm.length)} organizações; as demais não informam`)}
+   </div>
+   <div class="grid g3m" style="margin-bottom:16px">
+    <div class="card"><h2>Por tipo</h2><div class="bars">${bars(tip)}</div></div>
+    <div class="card"><h2>Por estado</h2><div class="bars">${bars(uf)}</div></div>
+    <div class="card"><h2>Principais áreas de atuação</h2><div class="bars">${bars(ar)}</div><p class="note">Uma organização pode ter mais de uma área. Verificação das fontes: ${vf.map(([k,v])=>k.toLowerCase()+' '+v).join(', ')}.</p></div>
+   </div>
+   <p class="note" style="margin:-6px 0 14px">Levantamento em sites, notícias e publicações, novembro de 2026. Nenhuma organização foi validada diretamente com a própria organização ainda.</p>`;
+}
 function vOrgs(){
   const tipos=[...new Set(D.orgs.map(o=>o.tipo))].sort(), ufs=[...new Set(D.orgs.filter(o=>o.uf&&o.escopo==='Brasil').map(o=>o.uf))].sort();
   shell('organizacoes',`<div class="page-h"><div><h1>Organizações</h1><p>Organizações de mulheres do café: coletivos, cooperativas, associações, núcleos, redes e programas mapeados na web. Cadastro em validação.</p></div></div>
+   ${orgInd()}
    <div class="filters" style="margin-bottom:14px"><div style="flex:1 1 260px;min-width:0"><label class="lbl" for="oq" hidden>Buscar</label><input id="oq" class="inp" placeholder="Buscar organização, município ou UF…" value="${esc(ST.oq)}"></div>
    <select id="oesc" class="sel" aria-label="Abrangência"><option value="Brasil">Brasil</option><option value="Internacional">Internacional</option><option value="">Todas</option></select>
    <select id="otipo" class="sel" aria-label="Tipo"><option value="">Tipo</option>${tipos.map(t=>`<option>${esc(t)}</option>`).join('')}</select>
@@ -755,7 +795,7 @@ function vSobre(){
   <div class="card" style="margin-bottom:16px"><h2>O que é</h2>
    <p>O Atlas das Mulheres do Café é uma iniciativa da <b>Embrapa Café</b> e da <b>Embrapa Territorial</b>. Ele reúne, organiza e torna visíveis informações sobre a participação das mulheres na cafeicultura brasileira: onde estão, quantas dirigem estabelecimentos com café, como acessam assistência técnica, cooperativas e máquinas, e como se organizam coletivamente.</p>
    <p>O objetivo é apoiar <b>gestoras e gestores públicos e tomadores de decisão</b>, <b>pesquisadoras e pesquisadores</b>, <b>equipes de assistência técnica e extensão rural</b>, <b>cooperativas e organizações</b> e as <b>próprias mulheres cafeicultoras</b>. O Atlas ajuda a orientar políticas, pesquisas e ações nos territórios onde elas fazem mais diferença.</p>
-   <p>O Atlas combina dados oficiais do IBGE (Censo Agropecuário 2017 e Produção Agrícola Municipal), parte dos dados do painel Café em Números e um mapeamento de organizações e iniciativas de mulheres do café. Ele está organizado em cinco módulos: Indicadores, Mapas, Municípios, Organizações e Histórias.</p></div>
+   <p>O Atlas combina dados oficiais do IBGE (Censo Agropecuário 2017 e Produção Agrícola Municipal), parte dos dados do painel Café em Números e um mapeamento de organizações e iniciativas de mulheres do café. Ele está organizado em cinco módulos: Indicadores, Mapas, Municípios, Organizações e Estudos.</p></div>
   <div class="grid g2"><div class="card"><h2>O que os números medem</h2><p>Os estabelecimentos com café (tabela 6955 do Censo Agropecuário 2017) e a estimativa de mulheres na direção por espécie foram trazidos do <a href="https://www.embrapa.br/web/cafe/painel-cafe-em-numeros" target="_blank" rel="noopener">painel Café em Números</a>, da Embrapa Café e da Embrapa Territorial. O IBGE não publica o café por sexo. Por isso, o número de mulheres é uma estimativa: em cada município, os estabelecimentos com café são multiplicados pela proporção de mulheres entre quem dirige os estabelecimentos agropecuários. O único dado observado de café por sexo é o dos estabelecimentos que têm o café como <b>atividade principal</b> (tabela 6883): 136,6 mil no país.</p>
   <p>Orientação técnica, cooperativismo, tratores e raça/cor das dirigentes valem para todas as atividades agropecuárias do município, porque o IBGE não publica esses temas cruzados com o café. O acesso a crédito por sexo não está publicado no SIDRA.</p>
   <p><b>Censo e PAM.</b> Todo número sobre mulheres e homens vem do Censo Agropecuário 2017, a única fonte com dado por sexo. A Produção Agrícola Municipal (PAM) mede a produção do município, sem informação sobre quem produz, e aparece no Atlas só como menção à parte, com o ano indicado. Proporções do Censo não são aplicadas a valores ou quantidades da PAM.</p></div>
